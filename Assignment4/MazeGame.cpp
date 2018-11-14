@@ -41,6 +41,7 @@ const int screenHeight = 600;
 
 
 # pragma mark - Function Prototypes
+/// Read in data from map file
 vector<Object> readMapFile(int *width, int *height);
 
 
@@ -76,6 +77,77 @@ int main(int argc, char *argv[]) {
     int width;
     int height;
     vector<Object> objects = readMapFile(&width, &height);
+    
+    SDL_Event windowEvent;
+    bool quit = false;
+    while (!quit){
+        while (SDL_PollEvent(&windowEvent)){  //inspect all events in the queue
+            if (windowEvent.type == SDL_QUIT) quit = true;
+            //List of keycodes: https://wiki.libsdl.org/SDL_Keycode - You can catch many special keys
+            //Scancode referes to a keyboard position, keycode referes to the letter (e.g., EU keyboards)
+            if (windowEvent.type == SDL_KEYUP && windowEvent.key.keysym.sym == SDLK_ESCAPE)
+                quit = true; //Exit event loop
+            if (windowEvent.type == SDL_KEYUP && windowEvent.key.keysym.sym == SDLK_f){ //If "f" is pressed
+                isFullScreen = !isFullScreen;
+                SDL_SetWindowFullscreen(window, isFullScreen ? SDL_WINDOW_FULLSCREEN : 0); //Toggle fullscreen
+            }
+            
+            //SJG: Use key input to change the state of the object
+            //     We can use the ".mod" flag to see if modifiers such as shift are pressed
+            if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_UP){ //If "up key" is pressed
+                //if (windowEvent.key.keysym.mod & KMOD_SHIFT) objx -= .1; //Is shift pressed?
+                //else objz += .1;
+            }
+            if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_DOWN){ //If "down key" is pressed
+                //if (windowEvent.key.keysym.mod & KMOD_SHIFT) objx += .1; //Is shift pressed?
+                //else objz -= .1;
+            }
+            if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_LEFT){ //If "up key" is pressed
+                //objy -= .1;
+            }
+            if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_RIGHT){ //If "down key" is pressed
+                //objy += .1;
+            }
+            if (windowEvent.type == SDL_KEYUP && windowEvent.key.keysym.sym == SDLK_c){ //If "c" is pressed
+                //colR = rand01();
+                //colG = rand01();
+                //colB = rand01();
+            }
+            
+        }
+        
+        // Clear the screen to default color
+        glClearColor(.2f, 0.4f, 0.8f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
+        /*glUseProgram(texturedShader);
+        
+        
+        timePast = SDL_GetTicks()/1000.f;
+        
+        glm::mat4 view = glm::lookAt(
+                                     glm::vec3(3.f, 0.f, 0.f),  //Cam Position
+                                     glm::vec3(0.0f, 0.0f, 0.0f),  //Look at point
+                                     glm::vec3(0.0f, 0.0f, 1.0f)); //Up
+        glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
+        
+        glm::mat4 proj = glm::perspective(3.14f/4, screenWidth / (float) screenHeight, 1.0f, 10.0f); //FOV, aspect, near, far
+        glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
+        
+        
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, tex0);
+        glUniform1i(glGetUniformLocation(texturedShader, "tex0"), 0);
+        
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, tex1);
+        glUniform1i(glGetUniformLocation(texturedShader, "tex1"), 1);
+        
+        glBindVertexArray(vao);
+        drawGeometry(texturedShader, startVertTeapot, numVertsTeapot, startVertKnot, numVertsKnot);
+        */
+        SDL_GL_SwapWindow(window); //Double buffering
+    }
     
     
     # pragma mark - Cleanup
