@@ -25,20 +25,27 @@
 # pragma mark - C++ Standard Library Includes
 #include <iostream>
 #include <fstream>
+#include <vector>
+#include <string>
 
 
 # pragma mark - Project Includes
 #include "CustomTypes.h"
 
+using namespace std;
 
+# pragma mark - Constants
 bool isFullScreen = false;  // TODO: not sure if I'll need this
 const int screenWidth = 800;
 const int screenHeight = 600;
 
 
+# pragma mark - Function Prototypes
+vector<Object> readMapFile(int *width, int *height);
+
 
 int main(int argc, char *argv[]) {
-    
+    # pragma mark - Setup
     SDL_Init(SDL_INIT_VIDEO);  // Initialize Graphics (for OpenGL)
     
     // Ask SDL to get a recent version of OpenGL (3.2 or greater)
@@ -65,9 +72,33 @@ int main(int argc, char *argv[]) {
     }
     
     
+    # pragma mark - Map File Reading
+    int width;
+    int height;
+    vector<Object> objects = readMapFile(&width, &height);
     
+    
+    # pragma mark - Cleanup
     SDL_GL_DeleteContext(context);
     SDL_Quit();
     
     return 0;
+}
+
+
+vector<Object> readMapFile(int *width, int *height) {
+    ifstream mapFile("mapInput.txt");
+    
+    if (!mapFile) {
+        cout << "Unable to open map input file\n";
+        exit(1);
+    }
+    
+    mapFile >> *width >> *height;
+    
+    vector<Object> objects;
+    
+    
+    
+    return objects;
 }
