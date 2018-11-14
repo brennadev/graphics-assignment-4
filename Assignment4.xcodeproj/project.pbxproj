@@ -287,6 +287,8 @@
 		65B1E527219B10DC003A5237 /* khrplatform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = khrplatform.h; sourceTree = "<group>"; };
 		65B1E52C219B1107003A5237 /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = ../../../../../../Library/Frameworks/SDL2.framework; sourceTree = "<group>"; };
 		65B1E52E219B1C85003A5237 /* MazeGame.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MazeGame.cpp; sourceTree = "<group>"; };
+		65B1E530219CA8B0003A5237 /* vertex.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = vertex.glsl; sourceTree = "<group>"; };
+		65B1E531219CA8C5003A5237 /* fragment.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = fragment.glsl; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -323,6 +325,8 @@
 			children = (
 				653725B021963CA900B2C7EA /* CustomTypes.h */,
 				65B1E52E219B1C85003A5237 /* MazeGame.cpp */,
+				65B1E530219CA8B0003A5237 /* vertex.glsl */,
+				65B1E531219CA8C5003A5237 /* fragment.glsl */,
 				65B1E524219B10DB003A5237 /* glad */,
 				65B1E423219B10DB003A5237 /* glm */,
 			);
