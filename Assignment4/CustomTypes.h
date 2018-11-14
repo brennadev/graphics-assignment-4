@@ -10,8 +10,10 @@
 #define CustomTypes_h
 
 /// All possible objects in a scene
-enum ObjectType = {
+enum ObjectType {
     wall,
+    start,
+    end,
     doorA,
     doorB,
     doorC,
@@ -22,10 +24,10 @@ enum ObjectType = {
     keyc,
     keyd,
     keye
-}
+};
 
 
-struct 2DPosition {
+struct Position2D {
     int x;
     int y;
 };
@@ -33,7 +35,11 @@ struct 2DPosition {
 
 struct Object {
     ObjectType type;
-    2DPosition position;
+    Position2D position;
+};
+
+struct Camera {
+    
 };
 
 
