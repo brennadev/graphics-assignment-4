@@ -98,7 +98,70 @@ vector<Object> readMapFile(int *width, int *height) {
     
     vector<Object> objects;
     
+    char currentItem;
     
+    for (int j = 0; j < *height; j++) {
+        for (int i = 0; i < *width; i++) {
+            mapFile >> currentItem;
+            
+            switch (currentItem) {
+                case 'S':
+                    objects.push_back({startLocation, {i, j}});
+                    break;
+                    
+                case 'G':
+                    objects.push_back({endLocation, {i, j}});
+                    break;
+                    
+                case 'W':
+                    objects.push_back({wall, {i, j}});
+                    break;
+                    
+                case 'A':
+                    objects.push_back({doorA, {i, j}});
+                    break;
+                    
+                case 'B':
+                    objects.push_back({doorB, {i, j}});
+                    break;
+                    
+                case 'C':
+                    objects.push_back({doorC, {i, j}});
+                    break;
+                    
+                case 'D':
+                    objects.push_back({doorD, {i, j}});
+                    break;
+                    
+                case 'E':
+                    objects.push_back({doorE, {i, j}});
+                    break;
+                    
+                case 'a':
+                    objects.push_back({keya, {i, j}});
+                    break;
+                    
+                case 'b':
+                    objects.push_back({keyb, {i, j}});
+                    break;
+                    
+                case 'c':
+                    objects.push_back({keyc, {i, j}});
+                    break;
+                    
+                case 'd':
+                    objects.push_back({keyd, {i, j}});
+                    break;
+                    
+                case 'e':
+                    objects.push_back({keye, {i, j}});
+                    break;
+                    
+                default:
+                    break;
+            }
+        }
+    }
     
     return objects;
 }

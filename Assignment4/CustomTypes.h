@@ -12,8 +12,8 @@
 /// All possible objects in a scene
 enum ObjectType {
     wall,
-    start,
-    end,
+    startLocation,
+    endLocation,
     doorA,
     doorB,
     doorC,
