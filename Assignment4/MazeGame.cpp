@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
     
     
     # pragma mark - Shader Setup
-    
+    int shaders = InitShader("vertex.glsl", "fragment.glsl");
     
     
     # pragma mark - Run Loop
