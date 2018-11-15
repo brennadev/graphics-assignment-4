@@ -76,6 +76,10 @@ int main(int argc, char *argv[]) {
     }
     
     
+    # pragma mark - Shader Setup
+    int shaders = InitShader("vertex.glsl", "fragment.glsl");
+    
+    
     # pragma mark - Map File Reading
     int width;
     int height;
@@ -97,9 +101,20 @@ int main(int argc, char *argv[]) {
     modelFile.close();
     
     # pragma mark - Model Setup
+    GLuint cubeVBO;
+    glGenBuffers(1, &cubeVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+    glBufferData(GL_ARRAY_BUFFER, numLines * sizeof(float), model1, GL_STATIC_DRAW);
     
-    # pragma mark - Shader Setup
-    int shaders = InitShader("vertex.glsl", "fragment.glsl");
+    
+    GLint positionAttribute = glGetAttribLocation(shaders, "positionIn");
+    glVertexAttribPointer(positionAttribute, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), 0);
+    glEnableVertexAttribArray(positionAttribute);
+    
+    GLint normalAttribute = glGetAttribLocation(shaders, "inNormal");
+    glVertexAttribPointer(normalAttribute, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(5 * sizeof(float)));
+    glEnableVertexAttribArray(normalAttribute);
+    
     
     
     # pragma mark - Run Loop
