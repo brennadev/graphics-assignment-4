@@ -86,6 +86,29 @@ int main(int argc, char *argv[]) {
     vector<Object> objects = readMapFile(&width, &height);
     
     
+    # pragma mark - Texture File Reading/Setup
+    SDL_Surface* surface = SDL_LoadBMP("cubeface.bmp");
+    
+    if (!surface) { // If it failed, print the error
+        printf("Error: \"%s\"\n",SDL_GetError());
+        return 1;
+    }
+    
+    GLuint texture0;
+    glGenTextures(1, &texture0);
+    
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture0);
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w,surface->h, 0, GL_BGR,GL_UNSIGNED_BYTE,surface->pixels);
+    glGenerateMipmap(GL_TEXTURE_2D); // Mip maps the texture
+    
+    SDL_FreeSurface(surface);
+    
     # pragma mark - Model File Reading
     ifstream modelFile;
     modelFile.open("cube.txt");
@@ -140,6 +163,8 @@ int main(int argc, char *argv[]) {
             }
             
             //SJG: Use key input to change the state of the object
+            
+            
             //     We can use the ".mod" flag to see if modifiers such as shift are pressed
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_UP){ //If "up key" is pressed
                 //if (windowEvent.key.keysym.mod & KMOD_SHIFT) objx -= .1; //Is shift pressed?
@@ -162,9 +187,9 @@ int main(int argc, char *argv[]) {
         glClearColor(.2f, 0.4f, 0.8f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        /*glUseProgram(texturedShader);
+        glUseProgram(shaders);
         
-        
+        /*
         timePast = SDL_GetTicks()/1000.f;
         
         glm::mat4 view = glm::lookAt(
@@ -209,6 +234,7 @@ int main(int argc, char *argv[]) {
 }
 
 
+# pragma mark - Other Setup
 vector<Object> readMapFile(int *width, int *height) {
     ifstream mapFile("mapInput.txt");
     
