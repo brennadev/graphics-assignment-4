@@ -3,6 +3,7 @@
 in vec3 positionIn;
 in vec3 inColor;
 in vec3 inNormal;
+in vec2 textureCoordinateIn;
 
 const vec3 inLightDirection = normalize(vec3(1, 0, 0));
 
@@ -15,6 +16,7 @@ out vec3 normal;
 out vec3 positionOut;
 out vec3 eyePosition;
 out vec3 lightDirection;
+out vec2 textureCoordinateOut;
 
 
 void main() {
@@ -25,4 +27,5 @@ void main() {
     normal = normal4.xyz;
     lightDirection = (view * vec4(inLightDirection, 0)).xyz;
     gl_Position = projection * position4;
+    textureCoordinateOut = textureCoordinateIn;
 }

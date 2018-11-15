@@ -87,7 +87,7 @@ int main(int argc, char *argv[]) {
     
     
     # pragma mark - Texture File Reading/Setup
-    SDL_Surface* surface = SDL_LoadBMP("cubeface.bmp");
+    SDL_Surface* surface = SDL_LoadBMP("Textures/cubeface.bmp");
     
     if (!surface) { // If it failed, print the error
         printf("Error: \"%s\"\n",SDL_GetError());
@@ -130,6 +130,7 @@ int main(int argc, char *argv[]) {
     glBufferData(GL_ARRAY_BUFFER, numLines * sizeof(float), model1, GL_STATIC_DRAW);
     
     
+    # pragma mark - Shader Buffer Setup
     GLuint positionAttribute = glGetAttribLocation(shaders, "positionIn");
     glVertexAttribPointer(positionAttribute, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), 0);
     glEnableVertexAttribArray(positionAttribute);
@@ -138,14 +139,27 @@ int main(int argc, char *argv[]) {
     glVertexAttribPointer(normalAttribute, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(5 * sizeof(float)));
     glEnableVertexAttribArray(normalAttribute);
     
+    GLuint textureAttribute = glGetAttribLocation(shaders, "textureCoordinateIn");
+    glEnableVertexAttribArray(textureAttribute);
+    glVertexAttribPointer(textureAttribute, 2, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(3*sizeof(float)));
+    
     glClearColor(.2f, 0.4f, 0.8f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     glUseProgram(shaders);
     glBindVertexArray(positionAttribute);  //Bind the VAO for the shaders we are using
     glBindVertexArray(normalAttribute);
+    glBindVertexArray(textureAttribute);
     glDrawArrays(GL_TRIANGLES, 0, 3); //Number of vertices
     
+    
+    GLint uniView = glGetUniformLocation(shaders, "view");
+    GLint uniProj = glGetUniformLocation(shaders, "projection");
+    
+    glBindVertexArray(0); // Unbind the VAO in case we want to create a new one
+    
+    
+    glEnable(GL_DEPTH_TEST);
     
     # pragma mark - Run Loop
     SDL_Event windowEvent;
@@ -189,8 +203,8 @@ int main(int argc, char *argv[]) {
         
         glUseProgram(shaders);
         
-        /*
-        timePast = SDL_GetTicks()/1000.f;
+        
+        //timePast = SDL_GetTicks()/1000.f;
         
         glm::mat4 view = glm::lookAt(
                                      glm::vec3(3.f, 0.f, 0.f),  //Cam Position
@@ -203,29 +217,24 @@ int main(int argc, char *argv[]) {
         
         
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, tex0);
-        glUniform1i(glGetUniformLocation(texturedShader, "tex0"), 0);
+        glBindTexture(GL_TEXTURE_2D, texture0);
+        glUniform1i(glGetUniformLocation(shaders, "tex0"), 0);
         
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, tex1);
-        glUniform1i(glGetUniformLocation(texturedShader, "tex1"), 1);
         
-        glBindVertexArray(vao);
-        drawGeometry(texturedShader, startVertTeapot, numVertsTeapot, startVertKnot, numVertsKnot);
-        */
+        //glBindVertexArray(vao);
+        //drawGeometry(texturedShader, startVertTeapot, numVertsTeapot, startVertKnot, numVertsKnot);
+        
         SDL_GL_SwapWindow(window); //Double buffering
     }
     
     
     # pragma mark - Cleanup
-    
-
-    
     glDeleteProgram(shaders);
     //glDeleteShader()
     glDeleteBuffers(1, &cubeVBO);
     glDeleteVertexArrays(1, &positionAttribute);
     glDeleteVertexArrays(1, &normalAttribute);
+    glDeleteVertexArrays(1, &textureAttribute);
     
     SDL_GL_DeleteContext(context);
     SDL_Quit();
