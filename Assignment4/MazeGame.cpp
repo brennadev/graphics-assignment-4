@@ -107,14 +107,21 @@ int main(int argc, char *argv[]) {
     glBufferData(GL_ARRAY_BUFFER, numLines * sizeof(float), model1, GL_STATIC_DRAW);
     
     
-    GLint positionAttribute = glGetAttribLocation(shaders, "positionIn");
+    GLuint positionAttribute = glGetAttribLocation(shaders, "positionIn");
     glVertexAttribPointer(positionAttribute, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), 0);
     glEnableVertexAttribArray(positionAttribute);
     
-    GLint normalAttribute = glGetAttribLocation(shaders, "inNormal");
+    GLuint normalAttribute = glGetAttribLocation(shaders, "inNormal");
     glVertexAttribPointer(normalAttribute, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(5 * sizeof(float)));
     glEnableVertexAttribArray(normalAttribute);
     
+    glClearColor(.2f, 0.4f, 0.8f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    glUseProgram(shaders);
+    glBindVertexArray(positionAttribute);  //Bind the VAO for the shaders we are using
+    glBindVertexArray(normalAttribute);
+    glDrawArrays(GL_TRIANGLES, 0, 3); //Number of vertices
     
     
     # pragma mark - Run Loop
@@ -147,11 +154,6 @@ int main(int argc, char *argv[]) {
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_RIGHT){ //If "down key" is pressed
                 //objy += .1;
-            }
-            if (windowEvent.type == SDL_KEYUP && windowEvent.key.keysym.sym == SDLK_c){ //If "c" is pressed
-                //colR = rand01();
-                //colG = rand01();
-                //colB = rand01();
             }
             
         }
@@ -191,6 +193,15 @@ int main(int argc, char *argv[]) {
     
     
     # pragma mark - Cleanup
+    
+
+    
+    glDeleteProgram(shaders);
+    //glDeleteShader()
+    glDeleteBuffers(1, &cubeVBO);
+    glDeleteVertexArrays(1, &positionAttribute);
+    glDeleteVertexArrays(1, &normalAttribute);
+    
     SDL_GL_DeleteContext(context);
     SDL_Quit();
     

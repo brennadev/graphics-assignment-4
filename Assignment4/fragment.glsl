@@ -14,7 +14,7 @@ void main() {
     vec3 N = normalize(normal);
     vec3 diffuseC = Color * max(dot(lightDirection, N), 0.0);
     vec3 ambientC = Color * ambient;
-    vec3 reflectDirection = reflect(-lightDir, N);
+    vec3 reflectDirection = reflect(-lightDirection, N);
     vec3 viewDirection = normalize(-position);
     float specular = max(dot(reflectDirection, viewDirection), 0.0);
     

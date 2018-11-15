@@ -22,7 +22,7 @@ void main() {
     vec4 position4 = view * model * vec4(positionIn, 1.0);
     positionOut = position4.xyz / position4.w;
     vec4 normal4 = transpose(inverse(view * model)) * vec4(inNormal, 0.0);
-    normalOut = normal4.xyz;
+    normal = normal4.xyz;
     lightDirection = (view * vec4(inLightDirection, 0)).xyz;
     gl_Position = projection * position4;
 }
