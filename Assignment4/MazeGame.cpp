@@ -82,6 +82,22 @@ int main(int argc, char *argv[]) {
     vector<Object> objects = readMapFile(&width, &height);
     
     
+    # pragma mark - Model File Reading
+    ifstream modelFile;
+    modelFile.open("cube.txt");
+    int numLines = 0;
+    modelFile >> numLines;
+    float* model1 = new float[numLines];
+    
+    for (int i = 0; i < numLines; i++){
+        modelFile >> model1[i];
+    }
+
+    int cubeVertexCount = numLines / 8;
+    modelFile.close();
+    
+    # pragma mark - Model Setup
+    
     # pragma mark - Shader Setup
     int shaders = InitShader("vertex.glsl", "fragment.glsl");
     
