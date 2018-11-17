@@ -91,6 +91,7 @@ int main(int argc, char *argv[]){
     # pragma mark - Camera Vars
     glm::vec3 cameraDirection = glm::vec3(1, 0, 0);
     float cameraAngle = 0;
+    glm::vec3 cameraPosition = glm::vec3(3.f, 0.f, 0.f);
     
     # pragma mark - Setup
     SDL_Init(SDL_INIT_VIDEO);  //Initialize Graphics (for OpenGL)
@@ -266,7 +267,7 @@ int main(int argc, char *argv[]){
     bool quit = false;
     while (!quit){
         
-        
+        float oldCameraAngle = cameraAngle;
         
         while (SDL_PollEvent(&windowEvent)){  //inspect all events in the queue
             if (windowEvent.type == SDL_QUIT) quit = true;
@@ -290,11 +291,11 @@ int main(int argc, char *argv[]){
                 else objz -= .1;
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_LEFT){ //If "up key" is pressed
-                cameraAngle -= 0.5;
+                cameraAngle -= 0.25;
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_RIGHT){ //If "down key" is pressed
                 //objy += .1;
-                cameraAngle += 0.5;
+                cameraAngle += 0.25;
             }
             if (windowEvent.type == SDL_KEYUP && windowEvent.key.keysym.sym == SDLK_c){ //If "c" is pressed
                 colR = rand01();
@@ -304,8 +305,16 @@ int main(int argc, char *argv[]){
             
         }
         
+        /*if (cameraAngle != oldCameraAngle) {
+            cout << "cameraAngle: " << cameraAngle << endl;
+        }*/
+        
+ 
+        
         cameraDirection.x = cos(cameraAngle);
         cameraDirection.y = sin(cameraAngle);
+        //cout << "cameraDirection x: " << cameraDirection.x << endl;
+        //cout << "cameraDirection y: " << cameraDirection.y << endl;
         
         // Clear the screen to default color
         glClearColor(.2f, 0.4f, 0.8f, 1.0f);
@@ -317,8 +326,8 @@ int main(int argc, char *argv[]){
         timePast = SDL_GetTicks()/1000.f;
         
         glm::mat4 view = glm::lookAt(
-                                     glm::vec3(3.f, 0.f, 0.f),  //Cam Position
-                                     cameraDirection,  //Look at point
+                                     cameraPosition,  //Cam Position
+                                     cameraPosition + cameraDirection,  //Look at point
                                      glm::vec3(0.0f, 0.0f, 1.0f)); //Up
         
         glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
