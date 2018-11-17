@@ -70,6 +70,7 @@ float objx=0, objy=0, objz=0;
 float colR=1, colG=1, colB=1;
 
 
+
 bool DEBUG_ON = true;
 GLuint InitShader(const char* vShaderFileName, const char* fShaderFileName);
 bool fullscreen = false;
@@ -87,6 +88,10 @@ vector<Object> readMapFile(int *width, int *height);
 
 
 int main(int argc, char *argv[]){
+    # pragma mark - Camera Vars
+    glm::vec3 cameraDirection = glm::vec3(1, 0, 0);
+    float cameraAngle = 0;
+    
     # pragma mark - Setup
     SDL_Init(SDL_INIT_VIDEO);  //Initialize Graphics (for OpenGL)
     
@@ -254,15 +259,14 @@ int main(int argc, char *argv[]){
     
     printf("%s\n",INSTRUCTIONS);
     
+    
+    # pragma mark - Run Loop
     //Event Loop (Loop forever processing each event as fast as possible)
     SDL_Event windowEvent;
     bool quit = false;
     while (!quit){
         
-        glm::mat4 view = glm::lookAt(
-                                     glm::vec3(3.f, 0.f, 0.f),  //Cam Position
-                                     glm::vec3(0.0f, 0.0f, 0.0f),  //Look at point
-                                     glm::vec3(0.0f, 0.0f, 1.0f)); //Up
+        
         
         while (SDL_PollEvent(&windowEvent)){  //inspect all events in the queue
             if (windowEvent.type == SDL_QUIT) quit = true;
@@ -286,10 +290,11 @@ int main(int argc, char *argv[]){
                 else objz -= .1;
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_LEFT){ //If "up key" is pressed
-                objy -= .1;
+                cameraAngle -= 0.5;
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_RIGHT){ //If "down key" is pressed
-                objy += .1;
+                //objy += .1;
+                cameraAngle += 0.5;
             }
             if (windowEvent.type == SDL_KEYUP && windowEvent.key.keysym.sym == SDLK_c){ //If "c" is pressed
                 colR = rand01();
@@ -298,6 +303,9 @@ int main(int argc, char *argv[]){
             }
             
         }
+        
+        cameraDirection.x = cos(cameraAngle);
+        cameraDirection.y = sin(cameraAngle);
         
         // Clear the screen to default color
         glClearColor(.2f, 0.4f, 0.8f, 1.0f);
@@ -308,10 +316,14 @@ int main(int argc, char *argv[]){
         
         timePast = SDL_GetTicks()/1000.f;
         
+        glm::mat4 view = glm::lookAt(
+                                     glm::vec3(3.f, 0.f, 0.f),  //Cam Position
+                                     cameraDirection,  //Look at point
+                                     glm::vec3(0.0f, 0.0f, 1.0f)); //Up
         
         glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
         
-        glm::mat4 proj = glm::perspective(3.14f/4, screenWidth / (float) screenHeight, 0.5f, 100.0f); //FOV, aspect, near, far
+        glm::mat4 proj = glm::perspective(3.14f/4, screenWidth / (float) screenHeight, 0.5f, 1000.0f); //FOV, aspect, near, far
         glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
         
         
@@ -357,7 +369,7 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
     for (int i = 0; i < objects.size(); i++) {
         if (objects.at(i).type == wall) {
             model = glm::mat4(); // Load identity
-            model = glm::translate(model,glm::vec3(objects.at(i).position.x * 0.5, 0, -1.0f * objects.at(i).position.y * 0.5));
+            model = glm::translate(model,glm::vec3(objects.at(i).position.x * 0.25f, objects.at(i).position.y * 0.25f, 0));
             //model = glm::scale(model,2.f*glm::vec3(1.f,1.f,0.5f)); //scale example
             model = glm::scale(model, 0.25f * glm::vec3(1, 1, 1));
             glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
