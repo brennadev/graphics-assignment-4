@@ -7,8 +7,6 @@
 //
 
 
-
-
 //Multi-Object, Multi-Texture Example
 //Stephen J. Guy, 2018
 
@@ -289,11 +287,11 @@ int main(int argc, char *argv[]){
                 cameraPosition -= cameraDirection * 0.05f;
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_LEFT){ //If "up key" is pressed
-                cameraAngle -= 0.1;
+                cameraAngle += 0.1;
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_RIGHT){ //If "down key" is pressed
                 //objy += .1;
-                cameraAngle += 0.1;
+                cameraAngle -= 0.1;
             }
         }
         
@@ -324,7 +322,7 @@ int main(int argc, char *argv[]){
         
         glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
         
-        glm::mat4 proj = glm::perspective(3.14f/4, screenWidth / (float) screenHeight, 0.5f, 1000.0f); //FOV, aspect, near, far
+        glm::mat4 proj = glm::perspective(3.14f/4, screenWidth / (float) screenHeight, 0.25f, 1000.0f); //FOV, aspect, near, far
         glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
         
         
