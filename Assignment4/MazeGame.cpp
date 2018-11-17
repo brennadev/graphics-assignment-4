@@ -67,7 +67,7 @@ float timePast = 0;
 float objx=0, objy=0, objz=0;
 float colR=1, colG=1, colB=1;
 
-
+const float cubeScaleValue = 0.25f;
 
 bool DEBUG_ON = true;
 GLuint InitShader(const char* vShaderFileName, const char* fShaderFileName);
@@ -82,7 +82,7 @@ float rand01(){
 void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int model2_start, int model2_numVerts, const vector<Object> &objects);
 
 
-vector<Object> readMapFile(int *width, int *height);
+vector<Object> readMapFile(int *width, int *height, Object *start);
 
 
 int main(int argc, char *argv[]){
@@ -119,11 +119,13 @@ int main(int argc, char *argv[]){
     
     
     
-    
     # pragma mark - Map File Reading
     int width;
     int height;
-    vector<Object> objects = readMapFile(&width, &height);
+    Object start;
+    vector<Object> objects = readMapFile(&width, &height, &start);
+    cameraPosition.x = cubeScaleValue * start.position.x;
+    cameraPosition.y = cubeScaleValue * start.position.y;
     
     
     //Here we will load two different model files
@@ -368,9 +370,9 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
     for (int i = 0; i < objects.size(); i++) {
         if (objects.at(i).type == wall) {
             model = glm::mat4(); // Load identity
-            model = glm::translate(model,glm::vec3(objects.at(i).position.x * 0.25f, objects.at(i).position.y * 0.25f, 0));
+            model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
             //model = glm::scale(model,2.f*glm::vec3(1.f,1.f,0.5f)); //scale example
-            model = glm::scale(model, 0.25f * glm::vec3(1, 1, 1));
+            model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
             glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
             
             //Set which texture to use (0 = wood texture ... bound to GL_TEXTURE0)
@@ -791,7 +793,7 @@ int main(int argc, char *argv[]) {
 */
 
 # pragma mark - Other Setup
-vector<Object> readMapFile(int *width, int *height) {
+vector<Object> readMapFile(int *width, int *height, Object *start) {
     ifstream mapFile("mapInput.txt");
     
     if (!mapFile) {
@@ -812,6 +814,7 @@ vector<Object> readMapFile(int *width, int *height) {
             switch (currentItem) {
                 case 'S':
                     objects.push_back({startLocation, {i, j}});
+                    *start = {startLocation, {i, j}};
                     break;
                     
                 case 'G':
