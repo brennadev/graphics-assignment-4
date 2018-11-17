@@ -91,6 +91,9 @@ int main(int argc, char *argv[]){
     float cameraAngle = 0;
     glm::vec3 cameraPosition = glm::vec3(3.f, 0.f, 0.f);
     
+    
+
+    
     # pragma mark - Setup
     SDL_Init(SDL_INIT_VIDEO);  //Initialize Graphics (for OpenGL)
     
@@ -127,6 +130,62 @@ int main(int argc, char *argv[]){
     cameraPosition.x = cubeScaleValue * start.position.x;
     cameraPosition.y = cubeScaleValue * start.position.y;
     
+    float playingAreaWidth = width * cubeScaleValue;
+    float playingAreaHeight = height * cubeScaleValue;
+    
+    # pragma mark - Floor Setup
+    // Note: This was such a simple thing that I just hardcoded it in - of course, it could've been specified in a model file too
+    
+    // floor vertex data - 6 vertices (2 triangles), 8 pieces of data
+    const int floorVertexCount = 48;
+    float *floorVertices = new float[floorVertexCount];
+    
+    // bottom left
+    floorVertices[0] = 0;                   // position x
+    floorVertices[1] = 0;                   // position y
+    floorVertices[3] = 0;                   // u
+    floorVertices[4] = 0;                   // v
+    
+    // top left
+    floorVertices[8] = 0;                   // position x
+    floorVertices[9] = playingAreaHeight;   // position y
+    floorVertices[11] = 0;                  // u
+    floorVertices[12] = 1;                  // v
+    
+    // top right
+    floorVertices[16] = playingAreaWidth;   // position x
+    floorVertices[17] = playingAreaHeight;  // position y
+    floorVertices[19] = 1;                  // u
+    floorVertices[20] = 1;                  // v
+    
+    // bottom left
+    floorVertices[24] = 0;                  // position x
+    floorVertices[25] = 0;                  // position y
+    floorVertices[27] = 0;                  // u
+    floorVertices[28] = 0;                  // v
+    
+    // top right
+    floorVertices[32] = playingAreaWidth;   // position x
+    floorVertices[33] = playingAreaHeight;  // position y
+    floorVertices[35] = 1;                  // u
+    floorVertices[36] = 1;                  // v
+    
+    // bottom right
+    floorVertices[40] = playingAreaWidth;   // position x
+    floorVertices[41] = 0;                  // position y
+    floorVertices[43] = 1;                  // u
+    floorVertices[44] = 0;                  // v
+    
+    
+    // initialize all values that are common to all vertices
+    for (int i = 0; i < 6; i++) {
+        int triangleStartLocation = i * 8;
+        floorVertices[triangleStartLocation + 2] = 0;   // position z
+        floorVertices[triangleStartLocation + 5] = 0;   // normal x
+        floorVertices[triangleStartLocation + 6] = 0;   // normal y
+        floorVertices[triangleStartLocation + 7] = 1;   // normal z
+    }
+    
     
     //Here we will load two different model files
     
@@ -159,16 +218,18 @@ int main(int argc, char *argv[]){
     // This structure works, but there is room for improvement here. Eg., you should store the start
     // and end of each model a data structure or array somewhere.
     //Concatenate model arrays
-    float* modelData = new float[(numVertsTeapot+numVertsKnot)*8];
-    copy(model1, model1+numVertsTeapot*8, modelData);
-    copy(model2, model2+numVertsKnot*8, modelData+numVertsTeapot*8);
-    int totalNumVerts = numVertsTeapot+numVertsKnot;
+    float* modelData = new float[(numVertsTeapot+numVertsKnot + floorVertexCount)*8];
+    copy(model1, model1 + numVertsTeapot * 8, modelData);
+    copy(model2, model2+numVertsKnot * 8, modelData+numVertsTeapot * 8);
+    copy(floorVertices, floorVertices + floorVertexCount * 8, modelData + (numVertsTeapot + numVertsKnot) * 8);
+    int totalNumVerts = numVertsTeapot+numVertsKnot + floorVertexCount;
     int startVertTeapot = 0;  //The teapot is the first model in the VBO
     int startVertKnot = numVertsTeapot; //The knot starts right after the taepot
+    int startVertFloor = numVertsTeapot + numVertsKnot;
     
     
     //// Allocate Texture 0 (Wood) ///////
-    SDL_Surface* surface = SDL_LoadBMP("wood.bmp");
+    SDL_Surface* surface = SDL_LoadBMP("cubeface.bmp");
     if (surface==NULL){ //If it failed, print the error
         printf("Error: \"%s\"\n",SDL_GetError()); return 1;
     }
@@ -193,7 +254,7 @@ int main(int argc, char *argv[]){
     
     
     //// Allocate Texture 1 (Brick) ///////
-    SDL_Surface* surface1 = SDL_LoadBMP("brick.bmp");
+    SDL_Surface* surface1 = SDL_LoadBMP("floor.bmp");
     if (surface==NULL){ //If it failed, print the error
         printf("Error: \"%s\"\n",SDL_GetError()); return 1;
     }
