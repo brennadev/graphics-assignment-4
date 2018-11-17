@@ -283,26 +283,18 @@ int main(int argc, char *argv[]){
             //SJG: Use key input to change the state of the object
             //     We can use the ".mod" flag to see if modifiers such as shift are pressed
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_UP){ //If "up key" is pressed
-                if (windowEvent.key.keysym.mod & KMOD_SHIFT) objx -= .1; //Is shift pressed?
-                else objz += .1;
+                cameraPosition += cameraDirection * 0.05f;
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_DOWN){ //If "down key" is pressed
-                if (windowEvent.key.keysym.mod & KMOD_SHIFT) objx += .1; //Is shift pressed?
-                else objz -= .1;
+                cameraPosition -= cameraDirection * 0.05f;
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_LEFT){ //If "up key" is pressed
-                cameraAngle -= 0.25;
+                cameraAngle -= 0.1;
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_RIGHT){ //If "down key" is pressed
                 //objy += .1;
-                cameraAngle += 0.25;
+                cameraAngle += 0.1;
             }
-            if (windowEvent.type == SDL_KEYUP && windowEvent.key.keysym.sym == SDLK_c){ //If "c" is pressed
-                colR = rand01();
-                colG = rand01();
-                colB = rand01();
-            }
-            
         }
         
         /*if (cameraAngle != oldCameraAngle) {
