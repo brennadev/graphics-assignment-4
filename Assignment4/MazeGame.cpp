@@ -187,8 +187,7 @@ int main(int argc, char *argv[]){
     }
     
     
-    //Here we will load two different model files
-    
+    # pragma mark - Model Loading
     //Load Model 1
     ifstream modelFile;
     modelFile.open("models/cube.txt");
@@ -199,8 +198,9 @@ int main(int argc, char *argv[]){
         modelFile >> model1[i];
     }
     printf("%d\n",numLines);
-    int numVertsTeapot = numLines/8;
+    int numVertsCube = numLines/8;
     modelFile.close();
+    
     
     //Load Model 2
     modelFile.open("models/knot.txt");
@@ -214,21 +214,38 @@ int main(int argc, char *argv[]){
     int numVertsKnot = numLines/8;
     modelFile.close();
     
+    
+    //Load Model 3
+    modelFile.open("models/teapot.txt");
+    numLines = 0;
+    modelFile >> numLines;
+    float* model3 = new float[numLines];
+    for (int i = 0; i < numLines; i++){
+        modelFile >> model3[i];
+    }
+    printf("%d\n",numLines);
+    int numVertsTeapot = numLines/8;
+    modelFile.close();
+    
+    
     # pragma mark - Vertex Data in One Structure
     //SJG: I load each model in a different array, then concatenate everything in one big array
     // This structure works, but there is room for improvement here. Eg., you should store the start
     // and end of each model a data structure or array somewhere.
     //Concatenate model arrays
-    float* modelData = new float[(numVertsTeapot+numVertsKnot + floorVertexCount)*8];
-    copy(model1, model1 + numVertsTeapot * 8, modelData);
-    copy(model2, model2+numVertsKnot * 8, modelData+numVertsTeapot * 8);
-    copy(floorVertices, floorVertices + floorVertexCount * 8, modelData + (numVertsTeapot + numVertsKnot) * 8);
-    int totalNumVerts = numVertsTeapot+numVertsKnot + floorVertexCount;
-    int startVertTeapot = 0;  //The teapot is the first model in the VBO
-    int startVertKnot = numVertsTeapot; //The knot starts right after the taepot
-    int startVertFloor = numVertsTeapot + numVertsKnot;
+    float* modelData = new float[(numVertsCube+numVertsKnot + floorVertexCount)*8];
+    copy(model1, model1 + numVertsCube * 8, modelData);
+    copy(model2, model2+numVertsKnot * 8, modelData+numVertsCube * 8);
+    copy(floorVertices, floorVertices + floorVertexCount * 8, modelData + (numVertsCube + numVertsKnot) * 8);
+    //copy(model3, model3 + numVertsTeapot * 8, modelData + (numVertsCube + numVertsKnot + floorVertexCount) * 8);
+    int totalNumVerts = numVertsCube+numVertsKnot + floorVertexCount;
+    int startVertCube = 0;  //The teapot is the first model in the VBO
+    int startVertKnot = numVertsCube; //The knot starts right after the taepot
+    int startVertFloor = numVertsCube + numVertsKnot;
+    int startVertTeapot = numVertsCube + numVertsKnot + floorVertexCount;
     
     
+    # pragma mark - Texture Allocation
     //// Allocate Texture 0 (Wood) ///////
     SDL_Surface* surface = SDL_LoadBMP("cubeface.bmp");
     if (surface==NULL){ //If it failed, print the error
@@ -278,6 +295,8 @@ int main(int argc, char *argv[]){
     SDL_FreeSurface(surface1);
     //// End Allocate Texture ///////
     
+    
+    # pragma mark - VAO/VBO Setup
     //Build a Vertex Array Object (VAO) to store mapping of shader attributse to VBO
     GLuint vao;
     glGenVertexArrays(1, &vao); //Create a VAO
@@ -375,7 +394,7 @@ int main(int argc, char *argv[]){
         
         glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
         
-        glm::mat4 proj = glm::perspective(3.14f/4, screenWidth / (float) screenHeight, 0.25f, 1000.0f); //FOV, aspect, near, far
+        glm::mat4 proj = glm::perspective(3.14f/4, screenWidth / (float) screenHeight, 0.03125f, 2000.0f); //FOV, aspect, near, far
         glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
         
         
@@ -388,7 +407,7 @@ int main(int argc, char *argv[]){
         glUniform1i(glGetUniformLocation(texturedShader, "tex1"), 1);
         
         glBindVertexArray(vao);
-        drawGeometry(texturedShader, startVertTeapot, numVertsTeapot, startVertFloor, floorVertexCount, objects);
+        drawGeometry(texturedShader, startVertCube, numVertsCube, startVertFloor, floorVertexCount, objects);
         
         SDL_GL_SwapWindow(window); //Double buffering
     }
@@ -426,6 +445,9 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
     
     // wall cubes
     for (int i = 0; i < objects.size(); i++) {
+        
+        
+        
         if (objects.at(i).type == wall) {
             model = glm::mat4(); // Load identity
             model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
