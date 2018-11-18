@@ -343,6 +343,8 @@ int main(int argc, char *argv[]){
     printf("%s\n",INSTRUCTIONS);
     
     
+    float playerRadius = 0.05;
+    
     # pragma mark - Run Loop
     //Event Loop (Loop forever processing each event as fast as possible)
     SDL_Event windowEvent;
@@ -362,10 +364,19 @@ int main(int argc, char *argv[]){
             
 
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_UP){ //If "up key" is pressed
-                cameraPosition += cameraDirection * 0.05f;
+                glm::vec3 newPosition = cameraDirection * 0.05f;
+                
+                if (isWalkable(newPosition.x, newPosition.y, playerRadius, width, height, objects)) {
+                    cameraPosition += newPosition;
+                }
+                
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_DOWN){ //If "down key" is pressed
-                cameraPosition -= cameraDirection * 0.05f;
+                glm::vec3 newPosition = cameraDirection * 0.05f;
+                
+                if (isWalkable(newPosition.x, newPosition.y, playerRadius, width, height, objects)) {
+                    cameraPosition -= newPosition;
+                }
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_LEFT){ //If "up key" is pressed
                 cameraAngle += 0.1;
@@ -634,26 +645,6 @@ GLuint InitShader(const char* vShaderFileName, const char* fShaderFileName){
 
 
 /*# pragma mark - Library Includes
-#include "glad/glad.h"  //Include order can matter here
-#if defined(__APPLE__) || defined(__linux__)
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_opengl.h>
-#else
-#include <SDL.h>
-#include <SDL_opengl.h>
-#endif
-
-#define GLM_FORCE_RADIANS
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtc/type_ptr.hpp"
-
-
-# pragma mark - C++ Standard Library Includes
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <string>
 
 
 # pragma mark - Project Includes
