@@ -70,19 +70,23 @@ float colR=1, colG=1, colB=1;
 const float cubeScaleValue = 0.25f;
 
 bool DEBUG_ON = true;
-GLuint InitShader(const char* vShaderFileName, const char* fShaderFileName);
+
 bool fullscreen = false;
-void Win2PPM(int width, int height);
+
 
 //srand(time(NULL));
 float rand01(){
     return rand()/(float)RAND_MAX;
 }
 
-void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int model2_start, int model2_numVerts, const vector<Object> &objects);
-
-
+# pragma mark - Function Prototypes
+GLuint InitShader(const char* vShaderFileName, const char* fShaderFileName);
+void Win2PPM(int width, int height);
+void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int model2_start, int model2_numVerts, int keyStart, int keyNumVerts, const vector<Object> &objects);
 vector<Object> readMapFile(int *width, int *height, Object *start);
+bool isWalkable(const float newX, const float newY, const float playerRadius, const int mapWidth, const int mapHeight, const vector<Object> &mapObjects);
+ObjectType findObjectAtPosition(const int x, const int y, const vector<Object> &mapObjects);
+bool isDoor(const ObjectType &object);
 
 
 int main(int argc, char *argv[]){
@@ -92,9 +96,7 @@ int main(int argc, char *argv[]){
     glm::vec3 cameraPosition = glm::vec3(3.f, 0.f, 0.f);
     
     
-
-    
-    # pragma mark - Setup
+    # pragma mark - Initial Setup
     SDL_Init(SDL_INIT_VIDEO);  //Initialize Graphics (for OpenGL)
     
     //Ask SDL to get a recent version of OpenGL (3.2 or greater)
@@ -121,7 +123,6 @@ int main(int argc, char *argv[]){
     }
     
     
-    
     # pragma mark - Map File Reading
     int width;
     int height;
@@ -133,6 +134,7 @@ int main(int argc, char *argv[]){
     float playingAreaWidth = width * cubeScaleValue;
     float playingAreaHeight = height * cubeScaleValue;
     
+    
     # pragma mark - Floor Setup
     // Note: This was such a simple thing that I just hardcoded it in - of course, it could've been specified in a model file too
     
@@ -141,13 +143,13 @@ int main(int argc, char *argv[]){
     float *floorVertices = new float[floorVertexCount];
     
     // bottom left
-    floorVertices[0] = 0;                   // position x
-    floorVertices[1] = 0;                   // position y
+    floorVertices[0] = 0 - 0.5 * cubeScaleValue;                   // position x
+    floorVertices[1] = 0 - 0.5 * cubeScaleValue;                   // position y
     floorVertices[3] = 0;                   // u
     floorVertices[4] = 0;                   // v
     
     // top left
-    floorVertices[8] = 0;                   // position x
+    floorVertices[8] = 0 - 0.5 * cubeScaleValue;                   // position x
     floorVertices[9] = playingAreaHeight;   // position y
     floorVertices[11] = 0;                  // u
     floorVertices[12] = 1;                  // v
@@ -159,8 +161,8 @@ int main(int argc, char *argv[]){
     floorVertices[20] = 1;                  // v
     
     // bottom left
-    floorVertices[24] = 0;                  // position x
-    floorVertices[25] = 0;                  // position y
+    floorVertices[24] = 0 - 0.5 * cubeScaleValue;                  // position x
+    floorVertices[25] = 0 - 0.5 * cubeScaleValue;                  // position y
     floorVertices[27] = 0;                  // u
     floorVertices[28] = 0;                  // v
     
@@ -172,7 +174,7 @@ int main(int argc, char *argv[]){
     
     // bottom right
     floorVertices[40] = playingAreaWidth;   // position x
-    floorVertices[41] = 0;                  // position y
+    floorVertices[41] = 0 - 0.5 * cubeScaleValue;                  // position y
     floorVertices[43] = 1;                  // u
     floorVertices[44] = 0;                  // v
     
@@ -233,14 +235,14 @@ int main(int argc, char *argv[]){
     // This structure works, but there is room for improvement here. Eg., you should store the start
     // and end of each model a data structure or array somewhere.
     //Concatenate model arrays
-    float* modelData = new float[(numVertsCube+numVertsKnot + floorVertexCount)*8];
+    float* modelData = new float[(numVertsCube+numVertsKnot + floorVertexCount + numVertsTeapot)*8];
     copy(model1, model1 + numVertsCube * 8, modelData);
     copy(model2, model2+numVertsKnot * 8, modelData+numVertsCube * 8);
     copy(floorVertices, floorVertices + floorVertexCount * 8, modelData + (numVertsCube + numVertsKnot) * 8);
-    //copy(model3, model3 + numVertsTeapot * 8, modelData + (numVertsCube + numVertsKnot + floorVertexCount) * 8);
+    copy(model3, model3 + numVertsTeapot * 8, modelData + (numVertsCube + numVertsKnot + floorVertexCount) * 8);
     int totalNumVerts = numVertsCube+numVertsKnot + floorVertexCount;
-    int startVertCube = 0;  //The teapot is the first model in the VBO
-    int startVertKnot = numVertsCube; //The knot starts right after the taepot
+    int startVertCube = 0;
+    int startVertKnot = numVertsCube;
     int startVertFloor = numVertsCube + numVertsKnot;
     int startVertTeapot = numVertsCube + numVertsKnot + floorVertexCount;
     
@@ -270,7 +272,7 @@ int main(int argc, char *argv[]){
     //// End Allocate Texture ///////
     
     
-    //// Allocate Texture 1 (Brick) ///////
+    //// Allocate Texture 1 (Floor) ///////
     SDL_Surface* surface1 = SDL_LoadBMP("floor.bmp");
     if (surface==NULL){ //If it failed, print the error
         printf("Error: \"%s\"\n",SDL_GetError()); return 1;
@@ -407,7 +409,7 @@ int main(int argc, char *argv[]){
         glUniform1i(glGetUniformLocation(texturedShader, "tex1"), 1);
         
         glBindVertexArray(vao);
-        drawGeometry(texturedShader, startVertCube, numVertsCube, startVertFloor, floorVertexCount, objects);
+        drawGeometry(texturedShader, startVertCube, numVertsCube, startVertFloor, floorVertexCount, startVertTeapot, numVertsTeapot, objects);
         
         SDL_GL_SwapWindow(window); //Double buffering
     }
@@ -422,7 +424,8 @@ int main(int argc, char *argv[]){
     return 0;
 }
 
-void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int model2_start, int model2_numVerts, const vector<Object> &objects){
+
+void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int model2_start, int model2_numVerts, int keyStart, int keyNumVerts, const vector<Object> &objects) {
     
     GLint uniColor = glGetUniformLocation(shaderProgram, "inColor");
     glm::vec3 colVec(colR,colG,colB);
@@ -443,23 +446,56 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
     glDrawArrays(GL_TRIANGLES, model2_start, model2_numVerts);
     
     
-    // wall cubes
+    // scene items
     for (int i = 0; i < objects.size(); i++) {
         
-        
-        
-        if (objects.at(i).type == wall) {
-            model = glm::mat4(); // Load identity
-            model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
-            //model = glm::scale(model,2.f*glm::vec3(1.f,1.f,0.5f)); //scale example
-            model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
-            glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
-            
-            //Set which texture to use (0 = wood texture ... bound to GL_TEXTURE0)
-            glUniform1i(uniTexID, 0);
-            
-            //Draw an instance of the model (at the position & orientation specified by the model matrix above)
-            glDrawArrays(GL_TRIANGLES, model1_start, model1_numVerts); //(Primitive Type, Start Vertex, Num Verticies)
+        switch (objects.at(i).type) {
+            case wall:
+                model = glm::mat4(); // Load identity
+                model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
+                //model = glm::scale(model,2.f*glm::vec3(1.f,1.f,0.5f)); //scale example
+                model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
+                glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
+                
+                //Set which texture to use (0 = wood texture ... bound to GL_TEXTURE0)
+                glUniform1i(uniTexID, 0);
+                
+                //Draw an instance of the model (at the position & orientation specified by the model matrix above)
+                glDrawArrays(GL_TRIANGLES, model1_start, model1_numVerts); //(Primitive Type, Start Vertex, Num Verticies)
+                break;
+                
+            case doorA:
+                break;
+            case doorB:
+                break;
+            case doorC:
+                break;
+            case doorD:
+                break;
+            case doorE:
+                break;
+            case keya:
+                model = glm::mat4(); // Load identity
+                model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
+                //model = glm::scale(model,2.f*glm::vec3(1.f,1.f,0.5f)); //scale example
+                model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
+                glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
+                
+                glUniform1i(uniTexID, 0);
+                
+                //Draw an instance of the model (at the position & orientation specified by the model matrix above)
+                glDrawArrays(GL_TRIANGLES, keyStart, keyNumVerts); //(Primitive Type, Start Vertex, Num Verticies)
+                break;
+            case keyb:
+                break;
+            case keyc:
+                break;
+            case keyd:
+                break;
+            case keye:
+                break;
+            default:
+                break;
         }
     }
 }
@@ -592,6 +628,8 @@ GLuint InitShader(const char* vShaderFileName, const char* fShaderFileName){
     
     return program;
 }
+
+
 
 
 
@@ -953,6 +991,47 @@ vector<Object> readMapFile(int *width, int *height, Object *start) {
     
     return objects;
 }
+
+
+bool isWalkable(const float newX, const float newY, const float playerRadius, const int mapWidth, const int mapHeight, const vector<Object> &mapObjects) {
+    int dxdyValues[] = {-1, 1, 2};
+    
+    for (int dx = 0; dx < 3; dx++) {
+        for (int dy = 0; dy < 3; dy++) {
+            float i = floor(newX + playerRadius * dxdyValues[dx]);
+            float j = floor(newY + playerRadius * dxdyValues[dy]);
+            
+            // check the edges
+            if (i < 1 || j < 1 || i > mapWidth || j > mapHeight) {
+                return false;
+            }
+            
+            ObjectType objectAtCurrentPosition = findObjectAtPosition(static_cast<int>(i), static_cast<int>(j), mapObjects);
+            
+            if (objectAtCurrentPosition == wall || isDoor(objectAtCurrentPosition)) {
+                return false;
+            }
+        }
+    }
+    
+    return true;
+}
+
+
+ObjectType findObjectAtPosition(const int x, const int y, const vector<Object> &mapObjects) {
+    for (int i = 0; i < mapObjects.size(); i++) {
+        if (mapObjects.at(i).position.x == x && mapObjects.at(i).position.y == y) {
+            return mapObjects.at(i).type;
+        }
+    }
+    return empty;
+}
+
+
+bool isDoor(const ObjectType &object) {
+    return (object == doorA || object == doorB || object == doorC || object == doorD || object == doorE);
+}
+
 
 /*
 # pragma mark - Shader Setup

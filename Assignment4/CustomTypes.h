@@ -11,6 +11,7 @@
 
 /// All possible objects in a scene
 enum ObjectType {
+    empty,          // nothing displayed at the location
     wall,
     startLocation,
     endLocation,
