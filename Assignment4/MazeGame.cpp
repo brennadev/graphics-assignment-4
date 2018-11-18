@@ -103,7 +103,7 @@ int main(int argc, char *argv[]){
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
     
     //Create a window (offsetx, offsety, width, height, flags)
-    SDL_Window* window = SDL_CreateWindow("My OpenGL Program", 100, 100, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
+    SDL_Window* window = SDL_CreateWindow("Maze Game", 100, 100, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
     
     //Create a context to draw in
     SDL_GLContext context = SDL_GL_CreateContext(window);
@@ -180,7 +180,7 @@ int main(int argc, char *argv[]){
     // initialize all values that are common to all vertices
     for (int i = 0; i < 6; i++) {
         int triangleStartLocation = i * 8;
-        floorVertices[triangleStartLocation + 2] = 0;   // position z
+        floorVertices[triangleStartLocation + 2] = -0.125;   // position z
         floorVertices[triangleStartLocation + 5] = 0;   // normal x
         floorVertices[triangleStartLocation + 6] = 0;   // normal y
         floorVertices[triangleStartLocation + 7] = 1;   // normal z
@@ -214,6 +214,7 @@ int main(int argc, char *argv[]){
     int numVertsKnot = numLines/8;
     modelFile.close();
     
+    # pragma mark - Vertex Data in One Structure
     //SJG: I load each model in a different array, then concatenate everything in one big array
     // This structure works, but there is room for improvement here. Eg., you should store the start
     // and end of each model a data structure or array somewhere.
@@ -242,8 +243,7 @@ int main(int argc, char *argv[]){
     //What to do outside 0-1 range
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
     
     //Load the texture into memory
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w,surface->h, 0, GL_BGR,GL_UNSIGNED_BYTE,surface->pixels);
@@ -326,9 +326,7 @@ int main(int argc, char *argv[]){
     //Event Loop (Loop forever processing each event as fast as possible)
     SDL_Event windowEvent;
     bool quit = false;
-    while (!quit){
-        
-        float oldCameraAngle = cameraAngle;
+    while (!quit) {
         
         while (SDL_PollEvent(&windowEvent)){  //inspect all events in the queue
             if (windowEvent.type == SDL_QUIT) quit = true;
@@ -341,8 +339,7 @@ int main(int argc, char *argv[]){
                 SDL_SetWindowFullscreen(window, fullscreen ? SDL_WINDOW_FULLSCREEN : 0); //Toggle fullscreen
             }
             
-            //SJG: Use key input to change the state of the object
-            //     We can use the ".mod" flag to see if modifiers such as shift are pressed
+
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_UP){ //If "up key" is pressed
                 cameraPosition += cameraDirection * 0.05f;
             }
@@ -353,21 +350,14 @@ int main(int argc, char *argv[]){
                 cameraAngle += 0.1;
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_RIGHT){ //If "down key" is pressed
-                //objy += .1;
                 cameraAngle -= 0.1;
             }
         }
-        
-        /*if (cameraAngle != oldCameraAngle) {
-            cout << "cameraAngle: " << cameraAngle << endl;
-        }*/
-        
  
         
         cameraDirection.x = cos(cameraAngle);
         cameraDirection.y = sin(cameraAngle);
-        //cout << "cameraDirection x: " << cameraDirection.x << endl;
-        //cout << "cameraDirection y: " << cameraDirection.y << endl;
+
         
         // Clear the screen to default color
         glClearColor(.2f, 0.4f, 0.8f, 1.0f);
@@ -398,7 +388,7 @@ int main(int argc, char *argv[]){
         glUniform1i(glGetUniformLocation(texturedShader, "tex1"), 1);
         
         glBindVertexArray(vao);
-        drawGeometry(texturedShader, startVertTeapot, numVertsTeapot, startVertKnot, numVertsKnot, objects);
+        drawGeometry(texturedShader, startVertTeapot, numVertsTeapot, startVertFloor, floorVertexCount, objects);
         
         SDL_GL_SwapWindow(window); //Double buffering
     }
@@ -427,7 +417,14 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
    
     GLint uniModel = glGetUniformLocation(shaderProgram, "model");
 
+    // floor
+    model = glm::mat4();    // triangle vertices are already set to their correct locations
+    glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
+    glUniform1i(uniTexID, 1);
+    glDrawArrays(GL_TRIANGLES, model2_start, model2_numVerts);
     
+    
+    // wall cubes
     for (int i = 0; i < objects.size(); i++) {
         if (objects.at(i).type == wall) {
             model = glm::mat4(); // Load identity
