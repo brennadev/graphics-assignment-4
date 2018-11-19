@@ -54,8 +54,6 @@ struct KeyLocation {
 
 
 # pragma mark - Functions on Objects
-
-
 /**
  Find the object (if there is one) at a given location in the game's grid
 
