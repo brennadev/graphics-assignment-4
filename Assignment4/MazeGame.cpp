@@ -82,11 +82,10 @@ float rand01(){
 # pragma mark - Function Prototypes
 GLuint InitShader(const char* vShaderFileName, const char* fShaderFileName);
 void Win2PPM(int width, int height);
-void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int model2_start, int model2_numVerts, int keyStart, int keyNumVerts, const vector<Object> &objects);
+void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int model2_start, int model2_numVerts, int keyStart, int keyNumVerts, int doorStart, int doorNumVerts, const vector<Object> &objects);
+
 vector<Object> readMapFile(int *width, int *height, Object *start);
 bool isWalkable(const float newX, const float newY, const float playerRadius, const int mapWidth, const int mapHeight, const vector<Object> &mapObjects);
-ObjectType findObjectAtPosition(const int x, const int y, const vector<Object> &mapObjects);
-bool isDoor(const ObjectType &object);
 
 
 int main(int argc, char *argv[]){
@@ -274,7 +273,7 @@ int main(int argc, char *argv[]){
     
     //// Allocate Texture 1 (Floor) ///////
     SDL_Surface* surface1 = SDL_LoadBMP("floor.bmp");
-    if (surface==NULL){ //If it failed, print the error
+    if (surface1==NULL){ //If it failed, print the error
         printf("Error: \"%s\"\n",SDL_GetError()); return 1;
     }
     GLuint tex1;
@@ -296,6 +295,34 @@ int main(int argc, char *argv[]){
     
     SDL_FreeSurface(surface1);
     //// End Allocate Texture ///////
+    
+    
+    //// Allocate Texture 1 (Floor) ///////
+    SDL_Surface* surface2 = SDL_LoadBMP("doorA.bmp");
+    if (surface2==NULL){ //If it failed, print the error
+        printf("Error: \"%s\"\n",SDL_GetError()); return 1;
+    }
+    GLuint tex2;
+    glGenTextures(1, &tex2);
+    
+    //Load the texture into memory
+    glActiveTexture(GL_TEXTURE2);
+    
+    glBindTexture(GL_TEXTURE_2D, tex2);
+    //What to do outside 0-1 range
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    //How to filter
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface2->w,surface2->h, 0, GL_BGR,GL_UNSIGNED_BYTE,surface2->pixels);
+    glGenerateMipmap(GL_TEXTURE_2D); //Mip maps the texture
+    
+    SDL_FreeSurface(surface2);
+    //// End Allocate Texture ///////
+    
+    
     
     
     # pragma mark - VAO/VBO Setup
@@ -419,8 +446,12 @@ int main(int argc, char *argv[]){
         glBindTexture(GL_TEXTURE_2D, tex1);
         glUniform1i(glGetUniformLocation(texturedShader, "tex1"), 1);
         
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, tex2);
+        glUniform1i(glGetUniformLocation(texturedShader, "tex2"), 2);
+        
         glBindVertexArray(vao);
-        drawGeometry(texturedShader, startVertCube, numVertsCube, startVertFloor, floorVertexCount, startVertTeapot, numVertsTeapot, objects);
+        drawGeometry(texturedShader, startVertCube, numVertsCube, startVertFloor, floorVertexCount, startVertTeapot, numVertsTeapot, startVertKnot, numVertsKnot, objects);
         
         SDL_GL_SwapWindow(window); //Double buffering
     }
@@ -436,7 +467,7 @@ int main(int argc, char *argv[]){
 }
 
 
-void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int model2_start, int model2_numVerts, int keyStart, int keyNumVerts, const vector<Object> &objects) {
+void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int model2_start, int model2_numVerts, int keyStart, int keyNumVerts, int doorStart, int doorNumVerts, const vector<Object> &objects) {
     
     GLint uniColor = glGetUniformLocation(shaderProgram, "inColor");
     glm::vec3 colVec(colR,colG,colB);
@@ -476,6 +507,16 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
                 break;
                 
             case doorA:
+                model = glm::mat4(); // Load identity
+                model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
+                //model = glm::scale(model,2.f*glm::vec3(1.f,1.f,0.5f)); //scale example
+                model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
+                glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
+            
+                glUniform1i(uniTexID, 2);
+            
+                //Draw an instance of the model (at the position & orientation specified by the model matrix above)
+                glDrawArrays(GL_TRIANGLES, doorStart, doorNumVerts); //(Primitive Type, Start Vertex, Num Verticies)
                 break;
             case doorB:
                 break;
@@ -1015,19 +1056,7 @@ bool isWalkable(const float newX, const float newY, const float playerRadius, co
 }
 
 
-ObjectType findObjectAtPosition(const int x, const int y, const vector<Object> &mapObjects) {
-    for (int i = 0; i < mapObjects.size(); i++) {
-        if (mapObjects.at(i).position.x == x && mapObjects.at(i).position.y == y) {
-            return mapObjects.at(i).type;
-        }
-    }
-    return empty;
-}
 
-
-bool isDoor(const ObjectType &object) {
-    return (object == doorA || object == doorB || object == doorC || object == doorD || object == doorE);
-}
 
 
 /*
