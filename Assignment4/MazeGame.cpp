@@ -67,7 +67,7 @@ float timePast = 0;
 float objx=0, objy=0, objz=0;
 float colR=1, colG=1, colB=1;
 
-const float cubeScaleValue = 0.25f;
+const float cubeScaleValue = 1.0f;
 
 bool DEBUG_ON = true;
 
@@ -343,7 +343,7 @@ int main(int argc, char *argv[]){
     printf("%s\n",INSTRUCTIONS);
     
     
-    float playerRadius = 0.05;
+    float playerRadius = 0.01;
     
     # pragma mark - Run Loop
     //Event Loop (Loop forever processing each event as fast as possible)
@@ -364,18 +364,18 @@ int main(int argc, char *argv[]){
             
 
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_UP){ //If "up key" is pressed
-                glm::vec3 newPosition = cameraDirection * 0.05f;
+                glm::vec3 newPosition = cameraPosition + cameraDirection * 0.05f;
                 
                 if (isWalkable(newPosition.x, newPosition.y, playerRadius, width, height, objects)) {
-                    cameraPosition += newPosition;
+                    cameraPosition = newPosition;
                 }
                 
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_DOWN){ //If "down key" is pressed
-                glm::vec3 newPosition = cameraDirection * 0.05f;
+                glm::vec3 newPosition = cameraPosition - cameraDirection * 0.05f;
                 
                 if (isWalkable(newPosition.x, newPosition.y, playerRadius, width, height, objects)) {
-                    cameraPosition -= newPosition;
+                    cameraPosition = newPosition;
                 }
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_LEFT){ //If "up key" is pressed
@@ -648,9 +648,6 @@ GLuint InitShader(const char* vShaderFileName, const char* fShaderFileName){
 
 
 # pragma mark - Project Includes
-#include "CustomTypes.h"
-
-using namespace std;
 
 
 # pragma mark - Constants
@@ -985,23 +982,32 @@ vector<Object> readMapFile(int *width, int *height, Object *start) {
 
 
 bool isWalkable(const float newX, const float newY, const float playerRadius, const int mapWidth, const int mapHeight, const vector<Object> &mapObjects) {
-    int dxdyValues[] = {-1, 1, 2};
+    float dxdyValues[] = {-1, 1, 2};
     
     for (int dx = 0; dx < 3; dx++) {
         for (int dy = 0; dy < 3; dy++) {
             float i = floor(newX + playerRadius * dxdyValues[dx]);
             float j = floor(newY + playerRadius * dxdyValues[dy]);
+            cout << "i: " << i << endl;
+            cout << "j: " << j << endl;
+            cout << "newX: " << newX << endl;
+            cout << "newY: " << newY << endl;
+            cout << "dx: " << dxdyValues[dx] << endl;
+            cout << "dy: " << dxdyValues[dy] << endl;
             
             // check the edges
-            if (i < 1 || j < 1 || i > mapWidth || j > mapHeight) {
+            if (i < cubeScaleValue || j < cubeScaleValue || i > mapWidth || j > mapHeight) {
                 return false;
             }
             
+            cout << "past edges" << endl;
             ObjectType objectAtCurrentPosition = findObjectAtPosition(static_cast<int>(i), static_cast<int>(j), mapObjects);
+            cout << "objectAtCurrentPosition: " << objectAtCurrentPosition << endl;
             
             if (objectAtCurrentPosition == wall || isDoor(objectAtCurrentPosition)) {
                 return false;
             }
+            cout << "past wall/door" << endl;
         }
     }
     
