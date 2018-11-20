@@ -122,8 +122,8 @@ int main(int argc, char *argv[]){
     int height;
     Object start;
     vector<Object> objects = readMapFile(&width, &height, &start);
-    cameraPosition.x = cubeScaleValue * start.position.x;
-    cameraPosition.y = cubeScaleValue * start.position.y;
+    cameraPosition.x = cubeScaleValue * start.position.x + 0.5;
+    cameraPosition.y = cubeScaleValue * start.position.y + 0.5;
     
     float playingAreaWidth = width * cubeScaleValue;
     float playingAreaHeight = height * cubeScaleValue;
@@ -474,7 +474,10 @@ int main(int argc, char *argv[]){
             
 
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_UP){ //If "up key" is pressed
-                glm::vec3 newPosition = cameraPosition + cameraDirection * 0.05f;
+                cout << "current camera position x: " << cameraPosition.x << endl;
+                cout << "current camera position y: " << cameraPosition.y << endl;
+                
+                glm::vec3 newPosition = cameraPosition + cameraDirection * 0.01f;
                 
                 if (isWalkable(newPosition.x, newPosition.y, playerRadius, width, height, objects)) {
                     cameraPosition = newPosition;
@@ -482,7 +485,12 @@ int main(int argc, char *argv[]){
                 
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_DOWN){ //If "down key" is pressed
-                glm::vec3 newPosition = cameraPosition - cameraDirection * 0.05f;
+                
+                
+                cout << "current camera position x: " << cameraPosition.x << endl;
+                cout << "current camera position y: " << cameraPosition.y << endl;
+                
+                glm::vec3 newPosition = cameraPosition - cameraDirection * 0.01f;
                 
                 if (isWalkable(newPosition.x, newPosition.y, playerRadius, width, height, objects)) {
                     cameraPosition = newPosition;
@@ -593,7 +601,7 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
         switch (objects.at(i).type) {
             case wall:
                 model = glm::mat4(); // Load identity
-                model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
+                model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue + 0.5, objects.at(i).position.y * cubeScaleValue + 0.5, 0));
                 model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
@@ -886,9 +894,9 @@ bool isWalkable(const float newX, const float newY, const float playerRadius, co
             ObjectType objectAtCurrentPosition = findObjectAtPosition(static_cast<int>(i), static_cast<int>(j), mapObjects);
             cout << "objectAtCurrentPosition: " << objectAtCurrentPosition << endl;
             
-            if (objectAtCurrentPosition == wall || isDoor(objectAtCurrentPosition)) {
+            /*if (objectAtCurrentPosition == wall || isDoor(objectAtCurrentPosition)) {
                 return false;
-            }
+            }*/
             cout << "past wall/door" << endl;
         }
     }
