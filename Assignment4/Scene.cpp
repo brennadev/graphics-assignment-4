@@ -8,6 +8,10 @@
 
 #include "Scene.h"
 
+Scene::Scene() {
+    
+}
+
 void Scene::checkForEvents() {
     glm::vec2 cameraDirectionNormalized = glm::normalize(glm::vec2(cameraDirection.x, cameraDirection.y));
     
@@ -35,9 +39,7 @@ void Scene::checkForEvents() {
             
             if (potentialKey.isKey) {
                 activeKeys.push_back({type, {i, j}});
-                
-                
-                
+                   
                 mapObjects.erase(mapObjects.begin() + potentialKey.location);
                 
                 // move key under floor
@@ -61,6 +63,7 @@ void Scene::checkForEvents() {
 }
 
 
+// TODO: fill in (move from MazeGame.cpp)
 bool Scene::isWalkable(float newX, float newY) {
     
     return true;

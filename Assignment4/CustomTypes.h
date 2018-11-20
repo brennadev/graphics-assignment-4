@@ -34,12 +34,19 @@ enum ObjectType {
 };
 
 
+/**
+ Grid Position (why the values are ints)
+ */
 struct Position2D {
     int x;
     int y;
 };
 
 
+
+/**
+ Object in the Scene
+ */
 struct Object {
     ObjectType type;
     Position2D position;

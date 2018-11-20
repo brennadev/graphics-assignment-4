@@ -19,6 +19,7 @@
 
 class Scene {
     public:
+    Scene();
     void checkForEvents();
     bool isWalkable(float newX, float newY);
     

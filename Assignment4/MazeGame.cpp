@@ -57,11 +57,10 @@ using namespace std;
 
 int screenWidth = 800;
 int screenHeight = 600;
-float timePast = 0;
+
 
 //SJG: Store the object coordinates
 //You should have a representation for the state of each object
-float objx=0, objy=0, objz=0;
 float colR=1, colG=1, colB=1;
 
 const float cubeScaleValue = 1.0f;
@@ -70,11 +69,6 @@ bool DEBUG_ON = true;
 
 bool fullscreen = false;
 
-
-//srand(time(NULL));
-float rand01(){
-    return rand()/(float)RAND_MAX;
-}
 
 # pragma mark - Function Prototypes
 GLuint InitShader(const char* vShaderFileName, const char* fShaderFileName);
@@ -90,6 +84,10 @@ int main(int argc, char *argv[]){
     glm::vec3 cameraDirection = glm::vec3(1, 0, 0);
     float cameraAngle = 0;
     glm::vec3 cameraPosition = glm::vec3(3.f, 0.f, 0.f);
+    
+    
+    # pragma mark - Scene Setup
+    Scene scene = Scene();
     
     
     # pragma mark - Initial Setup
@@ -132,7 +130,7 @@ int main(int argc, char *argv[]){
     
     
     # pragma mark - Floor Setup
-    // Note: This was such a simple thing that I just hardcoded it in - of course, it could've been specified in a model file too
+    // Note: This (the floor) was such a simple thing that I just hardcoded it in - of course, it could've been specified in a model file too
     
     // floor vertex data - 6 vertices (2 triangles), 8 pieces of data
     const int floorVertexCount = 48;
@@ -244,7 +242,7 @@ int main(int argc, char *argv[]){
     
     
     # pragma mark - Texture Allocation
-    //// Allocate Texture 0 (Wood) ///////
+    //// Allocate Texture 0 (Wall) ///////
     SDL_Surface* surface = SDL_LoadBMP("cubeface.bmp");
     if (surface==NULL){ //If it failed, print the error
         printf("Error: \"%s\"\n",SDL_GetError()); return 1;
@@ -283,9 +281,6 @@ int main(int argc, char *argv[]){
     //What to do outside 0-1 range
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    //How to filter
-    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface1->w,surface1->h, 0, GL_BGR,GL_UNSIGNED_BYTE,surface1->pixels);
     glGenerateMipmap(GL_TEXTURE_2D); //Mip maps the texture
@@ -294,7 +289,7 @@ int main(int argc, char *argv[]){
     //// End Allocate Texture ///////
     
     
-    //// Allocate Texture 1 (Floor) ///////
+    //// Allocate Texture 1 (Door A) ///////
     SDL_Surface* surface2 = SDL_LoadBMP("doorA.bmp");
     if (surface2==NULL){ //If it failed, print the error
         printf("Error: \"%s\"\n",SDL_GetError()); return 1;
@@ -309,9 +304,6 @@ int main(int argc, char *argv[]){
     //What to do outside 0-1 range
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    //How to filter
-    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface2->w,surface2->h, 0, GL_BGR,GL_UNSIGNED_BYTE,surface2->pixels);
     glGenerateMipmap(GL_TEXTURE_2D); //Mip maps the texture
@@ -322,7 +314,7 @@ int main(int argc, char *argv[]){
     
     
     
-    //// Allocate Texture 1 (Floor) ///////
+    //// Allocate Texture 1 (Door B) ///////
     SDL_Surface* surface3 = SDL_LoadBMP("doorB.bmp");
     if (surface3==NULL){ //If it failed, print the error
         printf("Error: \"%s\"\n",SDL_GetError()); return 1;
@@ -346,7 +338,7 @@ int main(int argc, char *argv[]){
     
     
     
-    //// Allocate Texture 1 (Floor) ///////
+    //// Allocate Texture 1 (Door C) ///////
     SDL_Surface* surface4 = SDL_LoadBMP("doorC.bmp");
     if (surface4==NULL){ //If it failed, print the error
         printf("Error: \"%s\"\n",SDL_GetError()); return 1;
@@ -369,7 +361,7 @@ int main(int argc, char *argv[]){
     //// End Allocate Texture ///////
     
     
-    //// Allocate Texture 1 (Floor) ///////
+    //// Allocate Texture 1 (Door D) ///////
     SDL_Surface* surface5 = SDL_LoadBMP("doorD.bmp");
     if (surface5==NULL){ //If it failed, print the error
         printf("Error: \"%s\"\n",SDL_GetError()); return 1;
@@ -393,7 +385,7 @@ int main(int argc, char *argv[]){
     
     
     
-    //// Allocate Texture 1 (Floor) ///////
+    //// Allocate Texture 1 (Door E) ///////
     SDL_Surface* surface6 = SDL_LoadBMP("doorE.bmp");
     if (surface3==NULL){ //If it failed, print the error
         printf("Error: \"%s\"\n",SDL_GetError()); return 1;
@@ -516,8 +508,6 @@ int main(int argc, char *argv[]){
         glUseProgram(texturedShader);
         
         
-        timePast = SDL_GetTicks()/1000.f;
-        
         glm::mat4 view = glm::lookAt(
                                      cameraPosition,  //Cam Position
                                      cameraPosition + cameraDirection,  //Look at point
@@ -525,7 +515,7 @@ int main(int argc, char *argv[]){
         
         glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
         
-        glm::mat4 proj = glm::perspective(3.14f/4, screenWidth / (float) screenHeight, 0.03125f, 2000.0f); //FOV, aspect, near, far
+        glm::mat4 proj = glm::perspective(3.14f/3, screenWidth / (float) screenHeight, 0.03125f, 2000.0f); //FOV, aspect, near, far
         glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
         
         
@@ -604,7 +594,6 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
             case wall:
                 model = glm::mat4(); // Load identity
                 model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
-                //model = glm::scale(model,2.f*glm::vec3(1.f,1.f,0.5f)); //scale example
                 model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
@@ -618,7 +607,6 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
             case doorA:
                 model = glm::mat4(); // Load identity
                 model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
-                //model = glm::scale(model,2.f*glm::vec3(1.f,1.f,0.5f)); //scale example
                 model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
             
@@ -631,7 +619,6 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
             case doorB:
                 model = glm::mat4(); // Load identity
                 model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
-                //model = glm::scale(model,2.f*glm::vec3(1.f,1.f,0.5f)); //scale example
                 model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
@@ -644,7 +631,6 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
             case doorC:
                 model = glm::mat4(); // Load identity
                 model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
-                //model = glm::scale(model,2.f*glm::vec3(1.f,1.f,0.5f)); //scale example
                 model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
@@ -657,7 +643,6 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
             case doorD:
                 model = glm::mat4(); // Load identity
                 model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
-                //model = glm::scale(model,2.f*glm::vec3(1.f,1.f,0.5f)); //scale example
                 model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
@@ -670,7 +655,6 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
             case doorE:
                 model = glm::mat4(); // Load identity
                 model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
-                //model = glm::scale(model,2.f*glm::vec3(1.f,1.f,0.5f)); //scale example
                 model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
@@ -683,7 +667,6 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
             case keya:
                 model = glm::mat4(); // Load identity
                 model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
-                //model = glm::scale(model,2.f*glm::vec3(1.f,1.f,0.5f)); //scale example
                 model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
@@ -696,7 +679,6 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
             case keyb:
                 model = glm::mat4(); // Load identity
                 model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
-                //model = glm::scale(model,2.f*glm::vec3(1.f,1.f,0.5f)); //scale example
                 model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
@@ -710,7 +692,6 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
             case keyc:
                 model = glm::mat4(); // Load identity
                 model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
-                //model = glm::scale(model,2.f*glm::vec3(1.f,1.f,0.5f)); //scale example
                 model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
@@ -723,7 +704,6 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
             case keyd:
                 model = glm::mat4(); // Load identity
                 model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
-                //model = glm::scale(model,2.f*glm::vec3(1.f,1.f,0.5f)); //scale example
                 model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
@@ -737,7 +717,6 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
             case keye:
                 model = glm::mat4(); // Load identity
                 model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
-                //model = glm::scale(model,2.f*glm::vec3(1.f,1.f,0.5f)); //scale example
                 model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
