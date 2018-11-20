@@ -82,7 +82,7 @@ void Win2PPM(int width, int height);
 void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int model2_start, int model2_numVerts, int keyStart, int keyNumVerts, int doorStart, int doorNumVerts, const vector<Object> &objects);
 
 bool isWalkable(const float newX, const float newY, const float playerRadius, const int mapWidth, const int mapHeight, const vector<Object> &mapObjects);
-void checkForEvents(const vector<Object> &objects);
+
 
 
 int main(int argc, char *argv[]){
@@ -141,38 +141,38 @@ int main(int argc, char *argv[]){
     // bottom left
     floorVertices[0] = 0 - 0.5 * cubeScaleValue;                   // position x
     floorVertices[1] = 0 - 0.5 * cubeScaleValue;                   // position y
-    floorVertices[3] = 0;                   // u
-    floorVertices[4] = 0;                   // v
+    floorVertices[3] = 0;                                          // u
+    floorVertices[4] = 0;                                          // v
     
     // top left
     floorVertices[8] = 0 - 0.5 * cubeScaleValue;                   // position x
-    floorVertices[9] = playingAreaHeight;   // position y
-    floorVertices[11] = 0;                  // u
-    floorVertices[12] = 1;                  // v
+    floorVertices[9] = playingAreaHeight - 0.5 * cubeScaleValue;   // position y
+    floorVertices[11] = 0;                                         // u
+    floorVertices[12] = 1;                                         // v
     
     // top right
-    floorVertices[16] = playingAreaWidth;   // position x
-    floorVertices[17] = playingAreaHeight;  // position y
-    floorVertices[19] = 1;                  // u
-    floorVertices[20] = 1;                  // v
+    floorVertices[16] = playingAreaWidth - 0.5 * cubeScaleValue;   // position x
+    floorVertices[17] = playingAreaHeight - 0.5 * cubeScaleValue;  // position y
+    floorVertices[19] = 1;                                         // u
+    floorVertices[20] = 1;                                         // v
     
     // bottom left
     floorVertices[24] = 0 - 0.5 * cubeScaleValue;                  // position x
     floorVertices[25] = 0 - 0.5 * cubeScaleValue;                  // position y
-    floorVertices[27] = 0;                  // u
-    floorVertices[28] = 0;                  // v
+    floorVertices[27] = 0;                                         // u
+    floorVertices[28] = 0;                                         // v
     
     // top right
-    floorVertices[32] = playingAreaWidth;   // position x
-    floorVertices[33] = playingAreaHeight;  // position y
-    floorVertices[35] = 1;                  // u
-    floorVertices[36] = 1;                  // v
+    floorVertices[32] = playingAreaWidth - 0.5 * cubeScaleValue;   // position x
+    floorVertices[33] = playingAreaHeight - 0.5 * cubeScaleValue;  // position y
+    floorVertices[35] = 1;                                         // u
+    floorVertices[36] = 1;                                         // v
     
     // bottom right
-    floorVertices[40] = playingAreaWidth;   // position x
+    floorVertices[40] = playingAreaWidth - 0.5 * cubeScaleValue;   // position x
     floorVertices[41] = 0 - 0.5 * cubeScaleValue;                  // position y
-    floorVertices[43] = 1;                  // u
-    floorVertices[44] = 0;                  // v
+    floorVertices[43] = 1;                                         // u
+    floorVertices[44] = 0;                                         // v
     
     
     // initialize all values that are common to all vertices
@@ -416,8 +416,6 @@ int main(int argc, char *argv[]){
     //// End Allocate Texture ///////
     
     
-    
-    
     # pragma mark - VAO/VBO Setup
     //Build a Vertex Array Object (VAO) to store mapping of shader attributse to VBO
     GLuint vao;
@@ -531,6 +529,7 @@ int main(int argc, char *argv[]){
         glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
         
         
+        # pragma mark - Activate Textures
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, tex0);
         glUniform1i(glGetUniformLocation(texturedShader, "tex0"), 0);
@@ -628,14 +627,59 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
                 //Draw an instance of the model (at the position & orientation specified by the model matrix above)
                 glDrawArrays(GL_TRIANGLES, doorStart, doorNumVerts); //(Primitive Type, Start Vertex, Num Verticies)
                 break;
+                
             case doorB:
+                model = glm::mat4(); // Load identity
+                model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
+                //model = glm::scale(model,2.f*glm::vec3(1.f,1.f,0.5f)); //scale example
+                model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
+                glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
+                
+                glUniform1i(uniTexID, 3);
+                
+                //Draw an instance of the model (at the position & orientation specified by the model matrix above)
+                glDrawArrays(GL_TRIANGLES, doorStart, doorNumVerts); //(Primitive Type, Start Vertex, Num Verticies)
                 break;
+                
             case doorC:
+                model = glm::mat4(); // Load identity
+                model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
+                //model = glm::scale(model,2.f*glm::vec3(1.f,1.f,0.5f)); //scale example
+                model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
+                glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
+                
+                glUniform1i(uniTexID, 4);
+                
+                //Draw an instance of the model (at the position & orientation specified by the model matrix above)
+                glDrawArrays(GL_TRIANGLES, doorStart, doorNumVerts); //(Primitive Type, Start Vertex, Num Verticies)
                 break;
+                
             case doorD:
+                model = glm::mat4(); // Load identity
+                model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
+                //model = glm::scale(model,2.f*glm::vec3(1.f,1.f,0.5f)); //scale example
+                model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
+                glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
+                
+                glUniform1i(uniTexID, 5);
+                
+                //Draw an instance of the model (at the position & orientation specified by the model matrix above)
+                glDrawArrays(GL_TRIANGLES, doorStart, doorNumVerts); //(Primitive Type, Start Vertex, Num Verticies)
                 break;
+                
             case doorE:
+                model = glm::mat4(); // Load identity
+                model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
+                //model = glm::scale(model,2.f*glm::vec3(1.f,1.f,0.5f)); //scale example
+                model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
+                glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
+                
+                glUniform1i(uniTexID, 6);
+                
+                //Draw an instance of the model (at the position & orientation specified by the model matrix above)
+                glDrawArrays(GL_TRIANGLES, doorStart, doorNumVerts); //(Primitive Type, Start Vertex, Num Verticies)
                 break;
+                
             case keya:
                 model = glm::mat4(); // Load identity
                 model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
@@ -643,19 +687,66 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
                 model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
-                glUniform1i(uniTexID, 0);
+                glUniform1i(uniTexID, 2);
                 
                 //Draw an instance of the model (at the position & orientation specified by the model matrix above)
                 glDrawArrays(GL_TRIANGLES, keyStart, keyNumVerts); //(Primitive Type, Start Vertex, Num Verticies)
                 break;
+                
             case keyb:
+                model = glm::mat4(); // Load identity
+                model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
+                //model = glm::scale(model,2.f*glm::vec3(1.f,1.f,0.5f)); //scale example
+                model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
+                glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
+                
+                glUniform1i(uniTexID, 3);
+                
+                //Draw an instance of the model (at the position & orientation specified by the model matrix above)
+                glDrawArrays(GL_TRIANGLES, keyStart, keyNumVerts); //(Primitive Type, Start Vertex, Num Verticies)
+                
                 break;
+                
             case keyc:
+                model = glm::mat4(); // Load identity
+                model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
+                //model = glm::scale(model,2.f*glm::vec3(1.f,1.f,0.5f)); //scale example
+                model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
+                glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
+                
+                glUniform1i(uniTexID, 4);
+                
+                //Draw an instance of the model (at the position & orientation specified by the model matrix above)
+                glDrawArrays(GL_TRIANGLES, keyStart, keyNumVerts); //(Primitive Type, Start Vertex, Num Verticies)
                 break;
+                
             case keyd:
+                model = glm::mat4(); // Load identity
+                model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
+                //model = glm::scale(model,2.f*glm::vec3(1.f,1.f,0.5f)); //scale example
+                model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
+                glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
+                
+                glUniform1i(uniTexID, 5);
+                
+                //Draw an instance of the model (at the position & orientation specified by the model matrix above)
+                glDrawArrays(GL_TRIANGLES, keyStart, keyNumVerts); //(Primitive Type, Start Vertex, Num Verticies)
+                
                 break;
+                
             case keye:
+                model = glm::mat4(); // Load identity
+                model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
+                //model = glm::scale(model,2.f*glm::vec3(1.f,1.f,0.5f)); //scale example
+                model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
+                glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
+                
+                glUniform1i(uniTexID, 6);
+                
+                //Draw an instance of the model (at the position & orientation specified by the model matrix above)
+                glDrawArrays(GL_TRIANGLES, keyStart, keyNumVerts); //(Primitive Type, Start Vertex, Num Verticies)
                 break;
+                
             default:
                 break;
         }
@@ -826,8 +917,3 @@ bool isWalkable(const float newX, const float newY, const float playerRadius, co
     return true;
 }
 
-void checkForEvents(const vector<Object> &objects) {
-    float dxdyValues[] = {-1, 1, 2};
-    
-    
-}
