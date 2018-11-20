@@ -43,10 +43,6 @@ const char* INSTRUCTIONS =
 #endif
 #include <cstdio>
 
-#define GLM_FORCE_RADIANS
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtc/type_ptr.hpp"
 
 #include <cstdio>
 #include <iostream>
@@ -54,7 +50,8 @@ const char* INSTRUCTIONS =
 #include <string>
 #include <vector>
 
-#include "CustomTypes.h"
+
+#include "Scene.h"
 
 using namespace std;
 
@@ -84,8 +81,8 @@ GLuint InitShader(const char* vShaderFileName, const char* fShaderFileName);
 void Win2PPM(int width, int height);
 void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int model2_start, int model2_numVerts, int keyStart, int keyNumVerts, int doorStart, int doorNumVerts, const vector<Object> &objects);
 
-vector<Object> readMapFile(int *width, int *height, Object *start);
 bool isWalkable(const float newX, const float newY, const float playerRadius, const int mapWidth, const int mapHeight, const vector<Object> &mapObjects);
+void checkForEvents(const vector<Object> &objects);
 
 
 int main(int argc, char *argv[]){
@@ -325,6 +322,102 @@ int main(int argc, char *argv[]){
     
     
     
+    //// Allocate Texture 1 (Floor) ///////
+    SDL_Surface* surface3 = SDL_LoadBMP("doorB.bmp");
+    if (surface3==NULL){ //If it failed, print the error
+        printf("Error: \"%s\"\n",SDL_GetError()); return 1;
+    }
+    GLuint tex3;
+    glGenTextures(1, &tex3);
+    
+    //Load the texture into memory
+    glActiveTexture(GL_TEXTURE3);
+    
+    glBindTexture(GL_TEXTURE_2D, tex3);
+    //What to do outside 0-1 range
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface3->w,surface3->h, 0, GL_BGR,GL_UNSIGNED_BYTE,surface3->pixels);
+    glGenerateMipmap(GL_TEXTURE_2D); //Mip maps the texture
+    
+    SDL_FreeSurface(surface3);
+    //// End Allocate Texture ///////
+    
+    
+    
+    //// Allocate Texture 1 (Floor) ///////
+    SDL_Surface* surface4 = SDL_LoadBMP("doorC.bmp");
+    if (surface4==NULL){ //If it failed, print the error
+        printf("Error: \"%s\"\n",SDL_GetError()); return 1;
+    }
+    GLuint tex4;
+    glGenTextures(1, &tex4);
+    
+    //Load the texture into memory
+    glActiveTexture(GL_TEXTURE4);
+    
+    glBindTexture(GL_TEXTURE_2D, tex4);
+    //What to do outside 0-1 range
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface4->w,surface4->h, 0, GL_BGR,GL_UNSIGNED_BYTE,surface4->pixels);
+    glGenerateMipmap(GL_TEXTURE_2D); //Mip maps the texture
+    
+    SDL_FreeSurface(surface4);
+    //// End Allocate Texture ///////
+    
+    
+    //// Allocate Texture 1 (Floor) ///////
+    SDL_Surface* surface5 = SDL_LoadBMP("doorD.bmp");
+    if (surface5==NULL){ //If it failed, print the error
+        printf("Error: \"%s\"\n",SDL_GetError()); return 1;
+    }
+    GLuint tex5;
+    glGenTextures(1, &tex5);
+    
+    //Load the texture into memory
+    glActiveTexture(GL_TEXTURE5);
+    
+    glBindTexture(GL_TEXTURE_2D, tex5);
+    //What to do outside 0-1 range
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface5->w,surface5->h, 0, GL_BGR,GL_UNSIGNED_BYTE,surface5->pixels);
+    glGenerateMipmap(GL_TEXTURE_2D); //Mip maps the texture
+    
+    SDL_FreeSurface(surface5);
+    //// End Allocate Texture ///////
+    
+    
+    
+    //// Allocate Texture 1 (Floor) ///////
+    SDL_Surface* surface6 = SDL_LoadBMP("doorE.bmp");
+    if (surface3==NULL){ //If it failed, print the error
+        printf("Error: \"%s\"\n",SDL_GetError()); return 1;
+    }
+    GLuint tex6;
+    glGenTextures(1, &tex6);
+    
+    //Load the texture into memory
+    glActiveTexture(GL_TEXTURE6);
+    
+    glBindTexture(GL_TEXTURE_2D, tex6);
+    //What to do outside 0-1 range
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface6->w,surface6->h, 0, GL_BGR,GL_UNSIGNED_BYTE,surface6->pixels);
+    glGenerateMipmap(GL_TEXTURE_2D); //Mip maps the texture
+    
+    SDL_FreeSurface(surface6);
+    //// End Allocate Texture ///////
+    
+    
+    
+    
     # pragma mark - VAO/VBO Setup
     //Build a Vertex Array Object (VAO) to store mapping of shader attributse to VBO
     GLuint vao;
@@ -449,6 +542,23 @@ int main(int argc, char *argv[]){
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, tex2);
         glUniform1i(glGetUniformLocation(texturedShader, "tex2"), 2);
+        
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, tex3);
+        glUniform1i(glGetUniformLocation(texturedShader, "tex3"), 3);
+        
+        glActiveTexture(GL_TEXTURE4);
+        glBindTexture(GL_TEXTURE_2D, tex4);
+        glUniform1i(glGetUniformLocation(texturedShader, "tex4"), 4);
+        
+        glActiveTexture(GL_TEXTURE5);
+        glBindTexture(GL_TEXTURE_2D, tex5);
+        glUniform1i(glGetUniformLocation(texturedShader, "tex5"), 5);
+        
+        glActiveTexture(GL_TEXTURE6);
+        glBindTexture(GL_TEXTURE_2D, tex6);
+        glUniform1i(glGetUniformLocation(texturedShader, "tex6"), 6);
+        
         
         glBindVertexArray(vao);
         drawGeometry(texturedShader, startVertCube, numVertsCube, startVertFloor, floorVertexCount, startVertTeapot, numVertsTeapot, startVertKnot, numVertsKnot, objects);
@@ -682,89 +792,7 @@ GLuint InitShader(const char* vShaderFileName, const char* fShaderFileName){
 }
 
 
-# pragma mark - Other Setup
-vector<Object> readMapFile(int *width, int *height, Object *start) {
-    ifstream mapFile("mapInput.txt");
-    
-    if (!mapFile) {
-        cout << "Unable to open map input file\n";
-        exit(1);
-    }
-    
-    mapFile >> *width >> *height;
-    
-    vector<Object> objects;
-    
-    char currentItem;
-    
-    for (int j = 0; j < *height; j++) {
-        for (int i = 0; i < *width; i++) {
-            mapFile >> currentItem;
-            
-            switch (currentItem) {
-                case 'S':
-                    objects.push_back({startLocation, {i, j}});
-                    *start = {startLocation, {i, j}};
-                    break;
-                    
-                case 'G':
-                    objects.push_back({endLocation, {i, j}});
-                    break;
-                    
-                case 'W':
-                    objects.push_back({wall, {i, j}});
-                    break;
-                    
-                case 'A':
-                    objects.push_back({doorA, {i, j}});
-                    break;
-                    
-                case 'B':
-                    objects.push_back({doorB, {i, j}});
-                    break;
-                    
-                case 'C':
-                    objects.push_back({doorC, {i, j}});
-                    break;
-                    
-                case 'D':
-                    objects.push_back({doorD, {i, j}});
-                    break;
-                    
-                case 'E':
-                    objects.push_back({doorE, {i, j}});
-                    break;
-                    
-                case 'a':
-                    objects.push_back({keya, {i, j}});
-                    break;
-                    
-                case 'b':
-                    objects.push_back({keyb, {i, j}});
-                    break;
-                    
-                case 'c':
-                    objects.push_back({keyc, {i, j}});
-                    break;
-                    
-                case 'd':
-                    objects.push_back({keyd, {i, j}});
-                    break;
-                    
-                case 'e':
-                    objects.push_back({keye, {i, j}});
-                    break;
-                    
-                default:
-                    break;
-            }
-        }
-    }
-    
-    return objects;
-}
-
-
+# pragma mark - Game Actions
 bool isWalkable(const float newX, const float newY, const float playerRadius, const int mapWidth, const int mapHeight, const vector<Object> &mapObjects) {
     float dxdyValues[] = {-1, 1, 2};
     
@@ -798,3 +826,8 @@ bool isWalkable(const float newX, const float newY, const float playerRadius, co
     return true;
 }
 
+void checkForEvents(const vector<Object> &objects) {
+    float dxdyValues[] = {-1, 1, 2};
+    
+    
+}

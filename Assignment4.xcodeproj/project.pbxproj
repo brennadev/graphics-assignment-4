@@ -12,6 +12,8 @@
 		65B1E52A219B10DC003A5237 /* glad.c in Sources */ = {isa = PBXBuildFile; fileRef = 65B1E526219B10DB003A5237 /* glad.c */; };
 		65B1E52D219B1107003A5237 /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B1E52C219B1107003A5237 /* SDL2.framework */; };
 		65B1E52F219B1C85003A5237 /* MazeGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 65B1E52E219B1C85003A5237 /* MazeGame.cpp */; };
+		65E2189F21A3587C005C2B7C /* Scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 65E2189E21A3587C005C2B7C /* Scene.cpp */; };
+		65E218A121A35BE0005C2B7C /* CustomTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 65E218A021A35BE0005C2B7C /* CustomTypes.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -29,6 +31,7 @@
 /* Begin PBXFileReference section */
 		653725A621963C9800B2C7EA /* Assignment4 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Assignment4; sourceTree = BUILT_PRODUCTS_DIR; };
 		653725B021963CA900B2C7EA /* CustomTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomTypes.h; sourceTree = "<group>"; };
+		654775AE21A356F700DC0C98 /* Scene.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Scene.h; sourceTree = "<group>"; };
 		65B1E424219B10DB003A5237 /* vec4.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = vec4.hpp; sourceTree = "<group>"; };
 		65B1E425219B10DB003A5237 /* integer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = integer.hpp; sourceTree = "<group>"; };
 		65B1E426219B10DB003A5237 /* copying.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = copying.txt; sourceTree = "<group>"; };
@@ -289,6 +292,8 @@
 		65B1E52E219B1C85003A5237 /* MazeGame.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MazeGame.cpp; sourceTree = "<group>"; };
 		65B1E530219CA8B0003A5237 /* vertex.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = vertex.glsl; sourceTree = "<group>"; };
 		65B1E531219CA8C5003A5237 /* fragment.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = fragment.glsl; sourceTree = "<group>"; };
+		65E2189E21A3587C005C2B7C /* Scene.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Scene.cpp; sourceTree = "<group>"; };
+		65E218A021A35BE0005C2B7C /* CustomTypes.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CustomTypes.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -324,6 +329,9 @@
 			isa = PBXGroup;
 			children = (
 				653725B021963CA900B2C7EA /* CustomTypes.h */,
+				65E218A021A35BE0005C2B7C /* CustomTypes.cpp */,
+				654775AE21A356F700DC0C98 /* Scene.h */,
+				65E2189E21A3587C005C2B7C /* Scene.cpp */,
 				65B1E52E219B1C85003A5237 /* MazeGame.cpp */,
 				65B1E530219CA8B0003A5237 /* vertex.glsl */,
 				65B1E531219CA8C5003A5237 /* fragment.glsl */,
@@ -694,6 +702,8 @@
 				65B1E52F219B1C85003A5237 /* MazeGame.cpp in Sources */,
 				65B1E529219B10DC003A5237 /* glm.cpp in Sources */,
 				65B1E528219B10DC003A5237 /* dummy.cpp in Sources */,
+				65E2189F21A3587C005C2B7C /* Scene.cpp in Sources */,
+				65E218A121A35BE0005C2B7C /* CustomTypes.cpp in Sources */,
 				65B1E52A219B10DC003A5237 /* glad.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
