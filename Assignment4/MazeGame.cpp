@@ -234,7 +234,7 @@ int main(int argc, char *argv[]){
     copy(model2, model2+numVertsKnot * 8, modelData+numVertsCube * 8);
     copy(floorVertices, floorVertices + floorVertexCount * 8, modelData + (numVertsCube + numVertsKnot) * 8);
     copy(model3, model3 + numVertsTeapot * 8, modelData + (numVertsCube + numVertsKnot + floorVertexCount) * 8);
-    int totalNumVerts = numVertsCube+numVertsKnot + floorVertexCount;
+    int totalNumVerts = numVertsCube+numVertsKnot + floorVertexCount + numVertsTeapot;
     int startVertCube = 0;
     int startVertKnot = numVertsCube;
     int startVertFloor = numVertsCube + numVertsKnot;
@@ -453,7 +453,7 @@ int main(int argc, char *argv[]){
     printf("%s\n",INSTRUCTIONS);
     
     
-    float playerRadius = 0.01;
+    float playerRadius = 0.1;
     
     # pragma mark - Run Loop
     //Event Loop (Loop forever processing each event as fast as possible)
@@ -477,7 +477,7 @@ int main(int argc, char *argv[]){
                 cout << "current camera position x: " << cameraPosition.x << endl;
                 cout << "current camera position y: " << cameraPosition.y << endl;
                 
-                glm::vec3 newPosition = cameraPosition + cameraDirection * 0.01f;
+                glm::vec3 newPosition = cameraPosition + cameraDirection * 0.1f;
                 
                 if (isWalkable(newPosition.x, newPosition.y, playerRadius, width, height, objects)) {
                     cameraPosition = newPosition;
@@ -490,7 +490,7 @@ int main(int argc, char *argv[]){
                 cout << "current camera position x: " << cameraPosition.x << endl;
                 cout << "current camera position y: " << cameraPosition.y << endl;
                 
-                glm::vec3 newPosition = cameraPosition - cameraDirection * 0.01f;
+                glm::vec3 newPosition = cameraPosition - cameraDirection * 0.1f;
                 
                 if (isWalkable(newPosition.x, newPosition.y, playerRadius, width, height, objects)) {
                     cameraPosition = newPosition;
@@ -523,7 +523,7 @@ int main(int argc, char *argv[]){
         
         glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
         
-        glm::mat4 proj = glm::perspective(3.14f/3, screenWidth / (float) screenHeight, 0.03125f, 2000.0f); //FOV, aspect, near, far
+        glm::mat4 proj = glm::perspective(3.14f/ 1.5f, screenWidth / (float) screenHeight, 0.03125f, 2000.0f); //FOV, aspect, near, far
         glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
         
         
@@ -614,7 +614,7 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
                 
             case doorA:
                 model = glm::mat4(); // Load identity
-                model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
+                model = glm::translate(model,glm::vec3(objects.at(i).position.x + 0.5, objects.at(i).position.y + 0.5, 0));
                 model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
             
@@ -626,7 +626,7 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
                 
             case doorB:
                 model = glm::mat4(); // Load identity
-                model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
+                model = glm::translate(model,glm::vec3(objects.at(i).position.x + 0.5, objects.at(i).position.y + 0.5, 0));
                 model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
@@ -638,7 +638,7 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
                 
             case doorC:
                 model = glm::mat4(); // Load identity
-                model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
+                model = glm::translate(model,glm::vec3(objects.at(i).position.x + 0.5, objects.at(i).position.y + 0.5, 0));
                 model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
@@ -650,7 +650,7 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
                 
             case doorD:
                 model = glm::mat4(); // Load identity
-                model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
+                model = glm::translate(model,glm::vec3(objects.at(i).position.x + 0.5, objects.at(i).position.y + 0.5, 0));
                 model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
@@ -662,7 +662,7 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
                 
             case doorE:
                 model = glm::mat4(); // Load identity
-                model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
+                model = glm::translate(model,glm::vec3(objects.at(i).position.x + 0.5, objects.at(i).position.y + 0.5, 0));
                 model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
@@ -674,8 +674,8 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
                 
             case keya:
                 model = glm::mat4(); // Load identity
-                model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
-                model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
+                model = glm::translate(model,glm::vec3(objects.at(i).position.x + 0.5, objects.at(i).position.y + 0.5, 0));
+                //model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
                 glUniform1i(uniTexID, 2);
@@ -686,7 +686,7 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
                 
             case keyb:
                 model = glm::mat4(); // Load identity
-                model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
+                model = glm::translate(model,glm::vec3(objects.at(i).position.x + 0.5, objects.at(i).position.y + 0.5, 0));
                 model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
@@ -699,7 +699,7 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
                 
             case keyc:
                 model = glm::mat4(); // Load identity
-                model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
+                model = glm::translate(model,glm::vec3(objects.at(i).position.x + 0.5, objects.at(i).position.y + 0.5, 0));
                 model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
@@ -711,7 +711,7 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
                 
             case keyd:
                 model = glm::mat4(); // Load identity
-                model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
+                model = glm::translate(model,glm::vec3(objects.at(i).position.x + 0.5, objects.at(i).position.y + 0.5, 0));
                 model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
@@ -724,7 +724,7 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
                 
             case keye:
                 model = glm::mat4(); // Load identity
-                model = glm::translate(model,glm::vec3(objects.at(i).position.x * cubeScaleValue, objects.at(i).position.y * cubeScaleValue, 0));
+                model = glm::translate(model,glm::vec3(objects.at(i).position.x + 0.5, objects.at(i).position.y + 0.5, 0));
                 model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
@@ -894,9 +894,9 @@ bool isWalkable(const float newX, const float newY, const float playerRadius, co
             ObjectType objectAtCurrentPosition = findObjectAtPosition(static_cast<int>(i), static_cast<int>(j), mapObjects);
             cout << "objectAtCurrentPosition: " << objectAtCurrentPosition << endl;
             
-            /*if (objectAtCurrentPosition == wall || isDoor(objectAtCurrentPosition)) {
+            if (objectAtCurrentPosition == wall || isDoor(objectAtCurrentPosition)) {
                 return false;
-            }*/
+            }
             cout << "past wall/door" << endl;
         }
     }
