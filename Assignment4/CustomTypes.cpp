@@ -65,7 +65,7 @@ KeyLocation isKey(const ObjectType &object, const vector<Object> &mapObjects) {
 
 
 vector<Object> readMapFile(int *width, int *height, Object *start) {
-    ifstream mapFile("mapInput.txt");
+    ifstream mapFile("mapInputsimplenowalls.txt");
     
     if (!mapFile) {
         cout << "Unable to open map input file\n";

@@ -878,11 +878,11 @@ bool isWalkable(const float newX, const float newY, const float playerRadius, co
             cout << "dy: " << dxdyValues[dy] << endl;
             
             // check the edges
-            if (i < cubeScaleValue || j < cubeScaleValue || i > mapWidth || j > mapHeight) {
+            /*if (i < cubeScaleValue || j < cubeScaleValue || i > mapWidth || j > mapHeight) {
                 return false;
-            }
+            }*/
             
-            cout << "past edges" << endl;
+            //cout << "past edges" << endl;
             ObjectType objectAtCurrentPosition = findObjectAtPosition(static_cast<int>(i), static_cast<int>(j), mapObjects);
             cout << "objectAtCurrentPosition: " << objectAtCurrentPosition << endl;
             
