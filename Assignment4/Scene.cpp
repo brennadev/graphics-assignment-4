@@ -28,51 +28,58 @@ void Scene::checkForEvents() {
             cout << "checkForEvents i: " << i << endl;
             cout << "checkForEvents j: " << j << endl;
             
-            /*if (i < 1 || j < 1 || i > mapSize.x || j > mapSize.y) {
+            if (i < 1 || j < 1 || i > mapSize.x || j > mapSize.y) {
                 continue;
-            }*/
+            }
             
+            cout << "past the edge check" << endl;
             
             glm::vec2 toGrid = glm::normalize(glm::vec2(static_cast<float>(i) + 0.5 - cameraPosition.x, static_cast<float>(j) + 0.5 - cameraPosition.y));
             
             float angToGrid = acos(glm::dot(toGrid, cameraDirectionNormalized));
             
-            if (abs(angToGrid) > M_PI / 8.0) {
+            /*if (abs(angToGrid) > M_PI / 8.0) {
                 continue;
-            }
+            }*/
+            
+            cout << "past the abs check" << endl;
             
             ObjectType type = findObjectAtPosition(i, j, mapObjects);
             
             
             KeyLocation potentialKey = isKey(type, mapObjects);
             
-            cout << "type: " << type << endl;
-            cout << "potentialKey: " << potentialKey.isKey << endl;
+
             
+            // pick up the key if found
             if (potentialKey.isKey) {
                 cout << "isKey true" << endl;
                 activeKeys.push_back({type, {(int)i, (int)j}});
                 
-                mapObjects.erase(mapObjects.begin() + potentialKey.location);
-                
-                // move key under floor
-                // TODO: not sure how I'll implement considering the location data stored - the only option would be if I set the location to (-1, -1) since it really doesn't matter where underneath the scene the key gets put (meaning the original location isn't needed)
-                
-                
-                // this means it's off the map
+
+                // {-1, -1} means it's off the map - as the map will always have walls, the teapots won't be noticeable if in a location that isn't inside the maze
                 mapObjects.at(potentialKey.location).position = {-1, -1};
+                return;
                 
             } else {
                 cout << "isKey false" << endl;
             }
             
+            cout << "type: " << type << endl;
+            
             // if a door for a held key is found, remove it as it's unlocked
             if (isDoor(type)) {
+                cout << "isDoor true" << endl;
                 DoorLocation matches = keyMatches(type, activeKeys, mapObjects);
                 
                 if (matches.matchingDoorFound) {
+                    cout << "matching door found" << endl;
                     mapObjects.erase(mapObjects.begin() + matches.location);
+                } else {
+                    cout << "matching door not found" << endl;
                 }
+            } else {
+                cout << "isDoor false" << endl;
             }
         }
     }

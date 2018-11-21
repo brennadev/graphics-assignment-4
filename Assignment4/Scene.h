@@ -100,6 +100,10 @@ class Scene {
         mapObjects = objects;
     }
     
+    inline vector<Object> & getActiveKeys() {
+        return activeKeys;
+    }
+    
     private:
     glm::vec3 cameraPosition;
     glm::vec3 cameraDirection;
