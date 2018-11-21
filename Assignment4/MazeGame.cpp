@@ -52,6 +52,8 @@ const char* INSTRUCTIONS =
 
 
 #include "Scene.h"
+#define GLM_FORCE_RADIANS
+#include "glm/gtx/rotate_vector.hpp"
 
 using namespace std;
 
@@ -73,7 +75,7 @@ bool fullscreen = false;
 # pragma mark - Function Prototypes
 GLuint InitShader(const char* vShaderFileName, const char* fShaderFileName);
 void Win2PPM(int width, int height);
-void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int model2_start, int model2_numVerts, int keyStart, int keyNumVerts, int doorStart, int doorNumVerts, const vector<Object> &objects, const vector<Object> &heldKeys, const glm::vec3 &cameraPosition);
+void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int model2_start, int model2_numVerts, int keyStart, int keyNumVerts, int doorStart, int doorNumVerts, const vector<Object> &objects, const vector<Object> &heldKeys, const glm::vec3 &cameraPosition, const glm::vec3 &cameraDirection, const float &cameraAngle);
 
 bool isWalkable(const float newX, const float newY, const float playerRadius, const int mapWidth, const int mapHeight, const vector<Object> &mapObjects);
 
@@ -552,7 +554,7 @@ int main(int argc, char *argv[]){
         
         
         glBindVertexArray(vao);
-        drawGeometry(texturedShader, startVertCube, numVertsCube, startVertFloor, numVertsFloor, startVertTeapot, numVertsTeapot, startVertKnot, numVertsKnot, scene.getMapObjects(), scene.getActiveKeys(), scene.getCameraPosition());
+        drawGeometry(texturedShader, startVertCube, numVertsCube, startVertFloor, numVertsFloor, startVertTeapot, numVertsTeapot, startVertKnot, numVertsKnot, scene.getMapObjects(), scene.getActiveKeys(), scene.getCameraPosition(), scene.getCameraDirection(), scene.getCameraAngle());
         
         SDL_GL_SwapWindow(window); //Double buffering
     }
@@ -568,7 +570,7 @@ int main(int argc, char *argv[]){
 }
 
 
-void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int model2_start, int model2_numVerts, int keyStart, int keyNumVerts, int doorStart, int doorNumVerts, const vector<Object> &objects, const vector<Object> &heldKeys, const glm::vec3 &cameraPosition) {
+void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int model2_start, int model2_numVerts, int keyStart, int keyNumVerts, int doorStart, int doorNumVerts, const vector<Object> &objects, const vector<Object> &heldKeys, const glm::vec3 &cameraPosition, const glm::vec3 &cameraDirection, const float &cameraAngle) {
     
     GLint uniColor = glGetUniformLocation(shaderProgram, "inColor");
     glm::vec3 colVec(colR,colG,colB);
@@ -740,6 +742,7 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
             case keya:
                 model = glm::translate(model,glm::vec3(cameraPosition.x - 0.4, cameraPosition.y + 0.5, 0.25));
                 model = glm::scale(model, 0.2f * glm::vec3(1, 1, 1));
+                //model = glm::rotate(model, cameraAngle, glm::vec3(0, 0, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
                 glUniform1i(uniTexID, 2);
@@ -749,8 +752,27 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
                 break;
                 
             case keyb:
-                model = glm::translate(model,glm::vec3(cameraPosition.x - 0.2, cameraPosition.y + 0.5, 0.25));
-                model = glm::scale(model, 0.2f * glm::vec3(1, 1, 1));
+                //model = glm::scale(model, 0.2f * glm::vec3(1, 1, 1));
+                
+                
+                
+                cout << "cameraAngle: " << cameraAngle << endl;
+                
+                model = glm::rotate(model, cameraAngle, glm::vec3(0, 0, 1));
+                
+                model = glm::translate(model, glm::vec3(-0.2, 0.5, 0.25));
+                
+                
+                //cout << endl;
+                
+                //model = glm::rotateZ(model, cameraAngle);
+                //glm::rotateZ(model, cameraAngle);
+
+                
+                //model = glm::translate(model,glm::vec3(cameraPosition.x + cameraDirection.x - 0.2, cameraPosition.y + 0.5, 0.25));
+                model = glm::translate(model,glm::vec3(cameraPosition.x, cameraPosition.y, 0));
+                
+                
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
                 glUniform1i(uniTexID, 3);
@@ -936,27 +958,12 @@ bool isWalkable(const float newX, const float newY, const float playerRadius, co
         for (int dy = 0; dy < 3; dy++) {
             float i = floor(newX + playerRadius * dxdyValues[dx]);
             float j = floor(newY + playerRadius * dxdyValues[dy]);
-            cout << "i: " << i << endl;
-            cout << "j: " << j << endl;
-            cout << "newX: " << newX << endl;
-            cout << "newY: " << newY << endl;
-            cout << "dx: " << dxdyValues[dx] << endl;
-            cout << "dy: " << dxdyValues[dy] << endl;
-            
-            // check the edges
-            /*if (i < cubeScaleValue || j < cubeScaleValue || i > mapWidth || j > mapHeight) {
-                return false;
-            }*/
-            
-            //cout << "past edges" << endl;
+
             ObjectType objectAtCurrentPosition = findObjectAtPosition(static_cast<int>(i), static_cast<int>(j), mapObjects);
-            cout << "objectAtCurrentPosition: " << objectAtCurrentPosition << endl;
             
             if (objectAtCurrentPosition == wall || isDoor(objectAtCurrentPosition)) {
                 return false;
-            }
-            cout << "past wall/door" << endl;
-        }
+            }        }
     }
     
     return true;

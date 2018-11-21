@@ -38,39 +38,47 @@ void Scene::checkForEvents() {
             
             float angToGrid = acos(glm::dot(toGrid, cameraDirectionNormalized));
             
+            
+            
             /*if (abs(angToGrid) > M_PI / 8.0) {
                 continue;
             }*/
             
             cout << "past the abs check" << endl;
             
+
             ObjectType type = findObjectAtPosition(i, j, mapObjects);
-            
-            
             KeyLocation potentialKey = isKey(type, mapObjects);
             
 
             
             // pick up the key if found
             if (potentialKey.isKey) {
-                cout << "isKey true" << endl;
                 activeKeys.push_back({type, {(int)i, (int)j}});
-                
 
                 // {-1, -1} means it's off the map - as the map will always have walls, the teapots won't be noticeable if in a location that isn't inside the maze
                 mapObjects.at(potentialKey.location).position = {-1, -1};
                 return;
-                
-            } else {
-                cout << "isKey false" << endl;
             }
             
             cout << "type: " << type << endl;
             
+            ObjectType potentialDoorType;
+            
+            if (cameraDirectionNormalized.x > cameraDirectionNormalized.y) {
+                potentialDoorType = findObjectAtPosition(floor(toGrid.x + cameraDirectionNormalized.x), toGrid.y, mapObjects);
+            } else if (cameraDirectionNormalized.y > cameraDirectionNormalized.x) {
+                potentialDoorType = findObjectAtPosition(toGrid.x, floor(toGrid.y + cameraDirectionNormalized.y), mapObjects);
+            } else {
+                potentialDoorType = findObjectAtPosition(floor(toGrid.x + cameraDirectionNormalized.x), floor(toGrid.y + cameraDirectionNormalized.y), mapObjects);
+            }
+            
+            cout << "potentialDoorType: " << potentialDoorType << endl;
+            
             // if a door for a held key is found, remove it as it's unlocked
-            if (isDoor(type)) {
+            if (isDoor(potentialDoorType)) {
                 cout << "isDoor true" << endl;
-                DoorLocation matches = keyMatches(type, activeKeys, mapObjects);
+                DoorLocation matches = keyMatches(potentialDoorType, activeKeys, mapObjects);
                 
                 if (matches.matchingDoorFound) {
                     cout << "matching door found" << endl;
