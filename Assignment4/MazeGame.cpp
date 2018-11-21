@@ -79,13 +79,7 @@ bool isWalkable(const float newX, const float newY, const float playerRadius, co
 
 
 
-int main(int argc, char *argv[]){
-    # pragma mark - Camera Vars
-    //glm::vec3 cameraDirection = glm::vec3(1, 0, 0);
-    float cameraAngle = 0;
-    //glm::vec3 cameraPosition = glm::vec3(3.f, 0.f, 0.f);
-    
-    
+int main(int argc, char *argv[]){  
     # pragma mark - Scene Setup
     Scene scene = Scene();
     
@@ -124,8 +118,6 @@ int main(int argc, char *argv[]){
     vector<Object> objects = readMapFile(&width, &height, &start);
     scene.setCameraPositionX(start.position.x + 0.5);
     scene.setCameraPositionY(start.position.y + 0.5);
-    cout << "start position x: " << start.position.x + 0.5 << endl;
-    cout << "start position y: " << start.position.y + 0.5 << endl;
     
     
     # pragma mark - Floor Setup
@@ -496,16 +488,16 @@ int main(int argc, char *argv[]){
                 scene.checkForEvents();
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_LEFT){ //If "up key" is pressed
-                cameraAngle += 0.1;
+                scene.incrementCameraAngle();
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_RIGHT){ //If "down key" is pressed
-                cameraAngle -= 0.1;
+                scene.decrementCameraAngle();
             }
         }
 
         
-        scene.setCameraDirectionX(cos(cameraAngle));
-        scene.setCameraDirectionY(sin(cameraAngle));
+        scene.setCameraDirectionX(cos(scene.getCameraAngle()));
+        scene.setCameraDirectionY(sin(scene.getCameraAngle()));
         
         // Clear the screen to default color
         glClearColor(.2f, 0.4f, 0.8f, 1.0f);

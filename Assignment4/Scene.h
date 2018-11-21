@@ -65,8 +65,23 @@ class Scene {
         cameraDirection.y = value;
     }
     
+    inline float getCameraAngle() {
+        return cameraAngle;
+    }
     
+    /**
+     Increment camera angle by 0.1
+     */
+    inline void incrementCameraAngle() {
+        cameraAngle += angleAdjustmentAmount;
+    }
     
+    /**
+     Decrement camera angle by 0.1
+     */
+    inline void decrementCameraAngle() {
+        cameraAngle -= angleAdjustmentAmount;
+    }
     
     private:
     glm::vec3 cameraPosition;
@@ -78,7 +93,9 @@ class Scene {
     vector<Object> mapObjects;
     vector<Object> activeKeys;
     
+    float angleAdjustmentAmount;
     const float dxdyValues[];
+    
     
 };
 

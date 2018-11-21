@@ -12,6 +12,7 @@ Scene::Scene() {
     cameraDirection = glm::vec3(1, 0, 0);
     cameraPosition = glm::vec3(3.f, 0.f, 0.f);
     cameraAngle = 0;
+    angleAdjustmentAmount = 0.1;
 }
 
 void Scene::checkForEvents() {
