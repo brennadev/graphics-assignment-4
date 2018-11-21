@@ -23,9 +23,55 @@ class Scene {
     void checkForEvents();
     bool isWalkable(float newX, float newY);
     
+    
+    inline glm::vec3 getCameraPosition() {
+        return cameraPosition;
+    }
+    
+    inline float getCameraPositionX() {
+        return cameraPosition.x;
+    }
+    
+    inline float getCameraPositionY() {
+        return cameraPosition.y;
+    }
+    
+    inline void setCameraPosition(const glm::vec3 &position) {
+        cameraPosition = position;
+    }
+    
+    inline void setCameraPositionX(const float &value) {
+        cameraPosition.x = value;
+    }
+    
+    inline void setCameraPositionY(const float &value) {
+        cameraPosition.y = value;
+    }
+    
+    
+    inline glm::vec3 getCameraDirection() {
+        return cameraDirection;
+    }
+    
+    inline void setCameraDirection(const glm::vec3 &direction) {
+        cameraDirection = direction;
+    }
+    
+    inline void setCameraDirectionX(const float &value) {
+        cameraDirection.x = value;
+    }
+    
+    inline void setCameraDirectionY(const float &value) {
+        cameraDirection.y = value;
+    }
+    
+    
+    
+    
     private:
     glm::vec3 cameraPosition;
     glm::vec3 cameraDirection;
+    float cameraAngle;
     float pickupRadius;
     float playerRadius;
     Position2D mapSize;

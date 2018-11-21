@@ -81,9 +81,9 @@ bool isWalkable(const float newX, const float newY, const float playerRadius, co
 
 int main(int argc, char *argv[]){
     # pragma mark - Camera Vars
-    glm::vec3 cameraDirection = glm::vec3(1, 0, 0);
+    //glm::vec3 cameraDirection = glm::vec3(1, 0, 0);
     float cameraAngle = 0;
-    glm::vec3 cameraPosition = glm::vec3(3.f, 0.f, 0.f);
+    //glm::vec3 cameraPosition = glm::vec3(3.f, 0.f, 0.f);
     
     
     # pragma mark - Scene Setup
@@ -122,8 +122,10 @@ int main(int argc, char *argv[]){
     int height;
     Object start;
     vector<Object> objects = readMapFile(&width, &height, &start);
-    cameraPosition.x = cubeScaleValue * start.position.x + 0.5;
-    cameraPosition.y = cubeScaleValue * start.position.y + 0.5;
+    scene.setCameraPositionX(start.position.x + 0.5);
+    scene.setCameraPositionY(start.position.y + 0.5);
+    cout << "start position x: " << start.position.x + 0.5 << endl;
+    cout << "start position y: " << start.position.y + 0.5 << endl;
     
     
     # pragma mark - Floor Setup
@@ -474,11 +476,11 @@ int main(int argc, char *argv[]){
 
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_UP){ //If "up key" is pressed
                 
-                glm::vec3 newPosition = cameraPosition + cameraDirection * 0.1f;
+                glm::vec3 newPosition = scene.getCameraPosition() + scene.getCameraDirection() * 0.1f;
                 
-                //if (isWalkable(newPosition.x, newPosition.y, playerRadius, width, height, objects)) {
-                    cameraPosition = newPosition;
-                //}
+                if (isWalkable(newPosition.x, newPosition.y, playerRadius, width, height, objects)) {
+                    scene.setCameraPosition(newPosition);
+                }
                 
                 scene.checkForEvents();
                 
@@ -486,11 +488,11 @@ int main(int argc, char *argv[]){
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_DOWN){ //If "down key" is pressed
 
                 
-                glm::vec3 newPosition = cameraPosition - cameraDirection * 0.1f;
+                glm::vec3 newPosition = scene.getCameraPosition() - scene.getCameraDirection() * 0.1f;
                 
-                //if (isWalkable(newPosition.x, newPosition.y, playerRadius, width, height, objects)) {
-                    cameraPosition = newPosition;
-                //}
+                if (isWalkable(newPosition.x, newPosition.y, playerRadius, width, height, objects)) {
+                    scene.setCameraPosition(newPosition);
+                }
                 scene.checkForEvents();
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_LEFT){ //If "up key" is pressed
@@ -500,11 +502,10 @@ int main(int argc, char *argv[]){
                 cameraAngle -= 0.1;
             }
         }
- 
-        
-        cameraDirection.x = cos(cameraAngle);
-        cameraDirection.y = sin(cameraAngle);
 
+        
+        scene.setCameraDirectionX(cos(cameraAngle));
+        scene.setCameraDirectionY(sin(cameraAngle));
         
         // Clear the screen to default color
         glClearColor(.2f, 0.4f, 0.8f, 1.0f);
@@ -514,8 +515,8 @@ int main(int argc, char *argv[]){
         
         
         glm::mat4 view = glm::lookAt(
-                                     cameraPosition,  //Cam Position
-                                     cameraPosition + cameraDirection,  //Look at point
+                                     scene.getCameraPosition(),  //Cam Position
+                                     scene.getCameraPosition() + scene.getCameraDirection(),  //Look at point
                                      glm::vec3(0.0f, 0.0f, 1.0f)); //Up
         
         glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
@@ -572,7 +573,6 @@ int main(int argc, char *argv[]){
 
 
 void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int model2_start, int model2_numVerts, int keyStart, int keyNumVerts, int doorStart, int doorNumVerts, const vector<Object> &objects) {
-    cout << "floor vertices: " << model2_numVerts << endl;
     
     GLint uniColor = glGetUniformLocation(shaderProgram, "inColor");
     glm::vec3 colVec(colR,colG,colB);
