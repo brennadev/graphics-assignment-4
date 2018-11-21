@@ -13,10 +13,10 @@ Scene::Scene() {
     cameraPosition = glm::vec3(3.f, 0.f, 0.f);
     cameraAngle = 0;
     angleAdjustmentAmount = 0.1;
+    pickupRadius = 2.0;
 }
 
 void Scene::checkForEvents() {
-    glm::vec2 cameraDirectionNormalized = glm::normalize(glm::vec2(cameraDirection.x, cameraDirection.y));
     
     for (int dx = 0; dx < 3; dx++) {
         for (int dy = 0; dy < 3; dy++) {
@@ -32,18 +32,7 @@ void Scene::checkForEvents() {
                 continue;
             }
             
-            cout << "past the edge check" << endl;
-            
-            glm::vec2 toGrid = glm::normalize(glm::vec2(static_cast<float>(i) + 0.5 - cameraPosition.x, static_cast<float>(j) + 0.5 - cameraPosition.y));
-            
-            float angToGrid = acos(glm::dot(toGrid, cameraDirectionNormalized));
-            
-            
-            
-            /*if (abs(angToGrid) > M_PI / 8.0) {
-                continue;
-            }*/
-            
+
             cout << "past the abs check" << endl;
             
 
@@ -63,22 +52,11 @@ void Scene::checkForEvents() {
             
             cout << "type: " << type << endl;
             
-            ObjectType potentialDoorType;
-            
-            if (cameraDirectionNormalized.x > cameraDirectionNormalized.y) {
-                potentialDoorType = findObjectAtPosition(floor(toGrid.x + cameraDirectionNormalized.x), toGrid.y, mapObjects);
-            } else if (cameraDirectionNormalized.y > cameraDirectionNormalized.x) {
-                potentialDoorType = findObjectAtPosition(toGrid.x, floor(toGrid.y + cameraDirectionNormalized.y), mapObjects);
-            } else {
-                potentialDoorType = findObjectAtPosition(floor(toGrid.x + cameraDirectionNormalized.x), floor(toGrid.y + cameraDirectionNormalized.y), mapObjects);
-            }
-            
-            cout << "potentialDoorType: " << potentialDoorType << endl;
-            
+
             // if a door for a held key is found, remove it as it's unlocked
-            if (isDoor(potentialDoorType)) {
+            if (isDoor(type)) {
                 cout << "isDoor true" << endl;
-                DoorLocation matches = keyMatches(potentialDoorType, activeKeys, mapObjects);
+                DoorLocation matches = keyMatches(type, activeKeys, mapObjects);
                 
                 if (matches.matchingDoorFound) {
                     cout << "matching door found" << endl;
