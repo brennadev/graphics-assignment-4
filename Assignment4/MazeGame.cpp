@@ -125,9 +125,6 @@ int main(int argc, char *argv[]){
     cameraPosition.x = cubeScaleValue * start.position.x + 0.5;
     cameraPosition.y = cubeScaleValue * start.position.y + 0.5;
     
-    float playingAreaWidth = width * cubeScaleValue;
-    float playingAreaHeight = height * cubeScaleValue;
-    
     
     # pragma mark - Floor Setup
     // Note: This (the floor) was such a simple thing that I just hardcoded it in - of course, it could've been specified in a model file too
@@ -137,40 +134,40 @@ int main(int argc, char *argv[]){
     float *floorVertices = new float[floorVertexCount];
     
     // bottom left
-    floorVertices[0] = 0 - 0.5 * cubeScaleValue;                   // position x
-    floorVertices[1] = 0 - 0.5 * cubeScaleValue;                   // position y
-    floorVertices[3] = 0;                                          // u
-    floorVertices[4] = 0;                                          // v
+    floorVertices[0] = 0;        // position x
+    floorVertices[1] = 0;        // position y
+    floorVertices[3] = 0;        // u
+    floorVertices[4] = 0;        // v
     
     // top left
-    floorVertices[8] = 0 - 0.5 * cubeScaleValue;                   // position x
-    floorVertices[9] = playingAreaHeight - 0.5 * cubeScaleValue;   // position y
-    floorVertices[11] = 0;                                         // u
-    floorVertices[12] = 1;                                         // v
+    floorVertices[8] = 0;        // position x
+    floorVertices[9] = height;   // position y
+    floorVertices[11] = 0;       // u
+    floorVertices[12] = 1;       // v
     
     // top right
-    floorVertices[16] = playingAreaWidth - 0.5 * cubeScaleValue;   // position x
-    floorVertices[17] = playingAreaHeight - 0.5 * cubeScaleValue;  // position y
-    floorVertices[19] = 1;                                         // u
-    floorVertices[20] = 1;                                         // v
+    floorVertices[16] = width;   // position x
+    floorVertices[17] = height;  // position y
+    floorVertices[19] = 1;       // u
+    floorVertices[20] = 1;       // v
     
     // bottom left
-    floorVertices[24] = 0 - 0.5 * cubeScaleValue;                  // position x
-    floorVertices[25] = 0 - 0.5 * cubeScaleValue;                  // position y
-    floorVertices[27] = 0;                                         // u
-    floorVertices[28] = 0;                                         // v
+    floorVertices[24] = 0;       // position x
+    floorVertices[25] = 0;       // position y
+    floorVertices[27] = 0;       // u
+    floorVertices[28] = 0;       // v
     
     // top right
-    floorVertices[32] = playingAreaWidth - 0.5 * cubeScaleValue;   // position x
-    floorVertices[33] = playingAreaHeight - 0.5 * cubeScaleValue;  // position y
-    floorVertices[35] = 1;                                         // u
-    floorVertices[36] = 1;                                         // v
+    floorVertices[32] = width;   // position x
+    floorVertices[33] = height;  // position y
+    floorVertices[35] = 1;       // u
+    floorVertices[36] = 1;       // v
     
     // bottom right
-    floorVertices[40] = playingAreaWidth - 0.5 * cubeScaleValue;   // position x
-    floorVertices[41] = 0 - 0.5 * cubeScaleValue;                  // position y
-    floorVertices[43] = 1;                                         // u
-    floorVertices[44] = 0;                                         // v
+    floorVertices[40] = width;   // position x
+    floorVertices[41] = 0;       // position y
+    floorVertices[43] = 1;       // u
+    floorVertices[44] = 0;       // v
     
     
     // initialize all values that are common to all vertices
@@ -479,9 +476,9 @@ int main(int argc, char *argv[]){
                 
                 glm::vec3 newPosition = cameraPosition + cameraDirection * 0.1f;
                 
-                if (isWalkable(newPosition.x, newPosition.y, playerRadius, width, height, objects)) {
+                //if (isWalkable(newPosition.x, newPosition.y, playerRadius, width, height, objects)) {
                     cameraPosition = newPosition;
-                }
+                //}
                 
                 scene.checkForEvents();
                 
@@ -491,9 +488,9 @@ int main(int argc, char *argv[]){
                 
                 glm::vec3 newPosition = cameraPosition - cameraDirection * 0.1f;
                 
-                if (isWalkable(newPosition.x, newPosition.y, playerRadius, width, height, objects)) {
+                //if (isWalkable(newPosition.x, newPosition.y, playerRadius, width, height, objects)) {
                     cameraPosition = newPosition;
-                }
+                //}
                 scene.checkForEvents();
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_LEFT){ //If "up key" is pressed
