@@ -182,6 +182,8 @@ int main(int argc, char *argv[]){
         floorVertices[triangleStartLocation + 7] = 1;   // normal z
     }
     
+    int numVertsFloor = floorVertexCount / 8;
+    
     
     # pragma mark - Model Loading
     //Load Model 1
@@ -232,13 +234,13 @@ int main(int argc, char *argv[]){
     float* modelData = new float[(numVertsCube+numVertsKnot + floorVertexCount + numVertsTeapot)*8];
     copy(model1, model1 + numVertsCube * 8, modelData);
     copy(model2, model2+numVertsKnot * 8, modelData+numVertsCube * 8);
-    copy(floorVertices, floorVertices + floorVertexCount * 8, modelData + (numVertsCube + numVertsKnot) * 8);
-    copy(model3, model3 + numVertsTeapot * 8, modelData + (numVertsCube + numVertsKnot + floorVertexCount) * 8);
-    int totalNumVerts = numVertsCube+numVertsKnot + floorVertexCount + numVertsTeapot;
+    copy(floorVertices, floorVertices + numVertsFloor * 8, modelData + (numVertsCube + numVertsKnot) * 8);
+    copy(model3, model3 + numVertsTeapot * 8, modelData + (numVertsCube + numVertsKnot + numVertsFloor) * 8);
+    int totalNumVerts = numVertsCube+numVertsKnot + numVertsFloor + numVertsTeapot;
     int startVertCube = 0;
     int startVertKnot = numVertsCube;
     int startVertFloor = numVertsCube + numVertsKnot;
-    int startVertTeapot = numVertsCube + numVertsKnot + floorVertexCount;
+    int startVertTeapot = numVertsCube + numVertsKnot + numVertsFloor;
     
     
     # pragma mark - Texture Allocation
@@ -474,8 +476,6 @@ int main(int argc, char *argv[]){
             
 
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_UP){ //If "up key" is pressed
-                cout << "current camera position x: " << cameraPosition.x << endl;
-                cout << "current camera position y: " << cameraPosition.y << endl;
                 
                 glm::vec3 newPosition = cameraPosition + cameraDirection * 0.1f;
                 
@@ -483,18 +483,18 @@ int main(int argc, char *argv[]){
                     cameraPosition = newPosition;
                 }
                 
+                scene.checkForEvents();
+                
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_DOWN){ //If "down key" is pressed
-                
-                
-                cout << "current camera position x: " << cameraPosition.x << endl;
-                cout << "current camera position y: " << cameraPosition.y << endl;
+
                 
                 glm::vec3 newPosition = cameraPosition - cameraDirection * 0.1f;
                 
                 if (isWalkable(newPosition.x, newPosition.y, playerRadius, width, height, objects)) {
                     cameraPosition = newPosition;
                 }
+                scene.checkForEvents();
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_LEFT){ //If "up key" is pressed
                 cameraAngle += 0.1;
@@ -558,7 +558,7 @@ int main(int argc, char *argv[]){
         
         
         glBindVertexArray(vao);
-        drawGeometry(texturedShader, startVertCube, numVertsCube, startVertFloor, floorVertexCount, startVertTeapot, numVertsTeapot, startVertKnot, numVertsKnot, objects);
+        drawGeometry(texturedShader, startVertCube, numVertsCube, startVertFloor, numVertsFloor, startVertTeapot, numVertsTeapot, startVertKnot, numVertsKnot, objects);
         
         SDL_GL_SwapWindow(window); //Double buffering
     }
@@ -575,6 +575,7 @@ int main(int argc, char *argv[]){
 
 
 void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int model2_start, int model2_numVerts, int keyStart, int keyNumVerts, int doorStart, int doorNumVerts, const vector<Object> &objects) {
+    cout << "floor vertices: " << model2_numVerts << endl;
     
     GLint uniColor = glGetUniformLocation(shaderProgram, "inColor");
     glm::vec3 colVec(colR,colG,colB);
@@ -674,7 +675,7 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
                 
             case keya:
                 model = glm::mat4(); // Load identity
-                model = glm::translate(model,glm::vec3(objects.at(i).position.x + 0.5, objects.at(i).position.y + 0.5, 0));
+                model = glm::translate(model,glm::vec3(objects.at(i).position.x + 0.5, objects.at(i).position.y + 0.5, 0.25));
                 //model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
@@ -686,7 +687,7 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
                 
             case keyb:
                 model = glm::mat4(); // Load identity
-                model = glm::translate(model,glm::vec3(objects.at(i).position.x + 0.5, objects.at(i).position.y + 0.5, 0));
+                model = glm::translate(model,glm::vec3(objects.at(i).position.x + 0.5, objects.at(i).position.y + 0.5, 0.25));
                 model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
@@ -699,7 +700,7 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
                 
             case keyc:
                 model = glm::mat4(); // Load identity
-                model = glm::translate(model,glm::vec3(objects.at(i).position.x + 0.5, objects.at(i).position.y + 0.5, 0));
+                model = glm::translate(model,glm::vec3(objects.at(i).position.x + 0.5, objects.at(i).position.y + 0.5, 0.25));
                 model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
@@ -711,7 +712,7 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
                 
             case keyd:
                 model = glm::mat4(); // Load identity
-                model = glm::translate(model,glm::vec3(objects.at(i).position.x + 0.5, objects.at(i).position.y + 0.5, 0));
+                model = glm::translate(model,glm::vec3(objects.at(i).position.x + 0.5, objects.at(i).position.y + 0.5, 0.25));
                 model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
@@ -724,7 +725,7 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
                 
             case keye:
                 model = glm::mat4(); // Load identity
-                model = glm::translate(model,glm::vec3(objects.at(i).position.x + 0.5, objects.at(i).position.y + 0.5, 0));
+                model = glm::translate(model,glm::vec3(objects.at(i).position.x + 0.5, objects.at(i).position.y + 0.5, 0.25));
                 model = glm::scale(model, cubeScaleValue * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
