@@ -115,13 +115,15 @@ int main(int argc, char *argv[]){
     int width;
     int height;
     Object start;
-    vector<Object> objects = readMapFile(&width, &height, &start);
+
+    scene.setMapObjects(readMapFile(&width, &height, &start));
+    scene.setMapSize({width, height});
+    
     scene.setCameraPositionX(start.position.x + 0.5);
     scene.setCameraPositionY(start.position.y + 0.5);
     
-    scene.setMapSize({width, height});
-    scene.setMapObjects(objects);
-    
+    cout << "width: " << width << endl;
+    cout << "height: " << height << endl;
     # pragma mark - Floor Setup
     // Note: This (the floor) was such a simple thing that I just hardcoded it in - of course, it could've been specified in a model file too
     
