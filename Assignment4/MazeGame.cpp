@@ -79,7 +79,7 @@ bool isWalkable(const float newX, const float newY, const float playerRadius, co
 
 
 
-int main(int argc, char *argv[]){  
+int main(int argc, char *argv[]){
     # pragma mark - Scene Setup
     Scene scene = Scene();
     
@@ -119,6 +119,8 @@ int main(int argc, char *argv[]){
     scene.setCameraPositionX(start.position.x + 0.5);
     scene.setCameraPositionY(start.position.y + 0.5);
     
+    scene.setMapSize({width, height});
+    scene.setMapObjects(objects);
     
     # pragma mark - Floor Setup
     // Note: This (the floor) was such a simple thing that I just hardcoded it in - of course, it could've been specified in a model file too
@@ -470,7 +472,7 @@ int main(int argc, char *argv[]){
                 
                 glm::vec3 newPosition = scene.getCameraPosition() + scene.getCameraDirection() * 0.1f;
                 
-                if (isWalkable(newPosition.x, newPosition.y, playerRadius, width, height, objects)) {
+                if (isWalkable(newPosition.x, newPosition.y, playerRadius, width, height, scene.getMapObjects())) {
                     scene.setCameraPosition(newPosition);
                 }
                 
@@ -482,7 +484,7 @@ int main(int argc, char *argv[]){
                 
                 glm::vec3 newPosition = scene.getCameraPosition() - scene.getCameraDirection() * 0.1f;
                 
-                if (isWalkable(newPosition.x, newPosition.y, playerRadius, width, height, objects)) {
+                if (isWalkable(newPosition.x, newPosition.y, playerRadius, width, height, scene.getMapObjects())) {
                     scene.setCameraPosition(newPosition);
                 }
                 scene.checkForEvents();
@@ -548,7 +550,7 @@ int main(int argc, char *argv[]){
         
         
         glBindVertexArray(vao);
-        drawGeometry(texturedShader, startVertCube, numVertsCube, startVertFloor, numVertsFloor, startVertTeapot, numVertsTeapot, startVertKnot, numVertsKnot, objects);
+        drawGeometry(texturedShader, startVertCube, numVertsCube, startVertFloor, numVertsFloor, startVertTeapot, numVertsTeapot, startVertKnot, numVertsKnot, scene.getMapObjects());
         
         SDL_GL_SwapWindow(window); //Double buffering
     }

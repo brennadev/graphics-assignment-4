@@ -83,6 +83,23 @@ class Scene {
         cameraAngle -= angleAdjustmentAmount;
     }
     
+    
+    inline Position2D getMapSize() {
+        return mapSize;
+    }
+    
+    inline void setMapSize(const Position2D &value) {
+        mapSize = value;
+    }
+    
+    inline vector<Object> & getMapObjects() {
+        return mapObjects;
+    }
+    
+    inline void setMapObjects(const vector<Object> &objects) {
+        mapObjects = objects;
+    }
+    
     private:
     glm::vec3 cameraPosition;
     glm::vec3 cameraDirection;
