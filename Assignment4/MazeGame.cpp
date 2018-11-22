@@ -123,9 +123,8 @@ int main(int argc, char *argv[]){
     
     scene.setCameraPositionX(start.position.x + 0.5);
     scene.setCameraPositionY(start.position.y + 0.5);
+
     
-    cout << "width: " << width << endl;
-    cout << "height: " << height << endl;
     # pragma mark - Floor Setup
     // Note: This (the floor) was such a simple thing that I just hardcoded it in - of course, it could've been specified in a model file too
     
@@ -519,7 +518,7 @@ int main(int argc, char *argv[]){
         
         glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
         
-        glm::mat4 proj = glm::perspective(3.14f/ 1.5f, screenWidth / (float) screenHeight, 0.03125f, 2000.0f); //FOV, aspect, near, far
+        glm::mat4 proj = glm::perspective(3.14f/ 1.75f, screenWidth / (float) screenHeight, 0.03125f, 2000.0f); //FOV, aspect, near, far
         glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
         
         
@@ -740,9 +739,11 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
         model = glm::mat4();
         switch (heldKeys.at(i).type) {
             case keya:
-                model = glm::translate(model,glm::vec3(cameraPosition.x - 0.4, cameraPosition.y + 0.5, 0.25));
-                model = glm::scale(model, 0.2f * glm::vec3(1, 1, 1));
-                //model = glm::rotate(model, cameraAngle, glm::vec3(0, 0, 1));
+                model = glm::translate(model,glm::vec3(cameraPosition.x, cameraPosition.y, 0));
+                
+                model = glm::rotate(model, cameraAngle, glm::vec3(0, 0, 1));
+                model = glm::translate(model, glm::vec3(0.2, 0.1, 0.005));
+                model = glm::scale(model, 0.15f * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
                 glUniform1i(uniTexID, 2);
@@ -752,26 +753,10 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
                 break;
                 
             case keyb:
-                //model = glm::scale(model, 0.2f * glm::vec3(1, 1, 1));
-                
-                
-                
-                cout << "cameraAngle: " << cameraAngle << endl;
-                
-                model = glm::rotate(model, cameraAngle, glm::vec3(0, 0, 1));
-                
-                model = glm::translate(model, glm::vec3(-0.2, 0.5, 0.25));
-                
-                
-                //cout << endl;
-                
-                //model = glm::rotateZ(model, cameraAngle);
-                //glm::rotateZ(model, cameraAngle);
-
-                
-                //model = glm::translate(model,glm::vec3(cameraPosition.x + cameraDirection.x - 0.2, cameraPosition.y + 0.5, 0.25));
                 model = glm::translate(model,glm::vec3(cameraPosition.x, cameraPosition.y, 0));
-                
+                model = glm::rotate(model, cameraAngle, glm::vec3(0, 0, 1));
+                model = glm::translate(model, glm::vec3(0.3, 0.1, 0.005));
+                model = glm::scale(model, 0.15f * glm::vec3(1, 1, 1));
                 
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
@@ -782,8 +767,11 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
                 break;
                 
             case keyc:
-                model = glm::translate(model,glm::vec3(cameraPosition.x, cameraPosition.y + 0.5, 0.25));
-                model = glm::scale(model, 0.2f * glm::vec3(1, 1, 1));
+                model = glm::translate(model,glm::vec3(cameraPosition.x, cameraPosition.y, 0));
+                
+                model = glm::rotate(model, cameraAngle, glm::vec3(0, 0, 1));
+                model = glm::translate(model, glm::vec3(0.4, 0.1, 0.005));
+                model = glm::scale(model, 0.15f * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
                 glUniform1i(uniTexID, 4);
@@ -793,8 +781,11 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
                 break;
                 
             case keyd:
-                model = glm::translate(model,glm::vec3(cameraPosition.x + 0.2, cameraPosition.y + 0.5, 0.25));
-                model = glm::scale(model, 0.2f * glm::vec3(1, 1, 1));
+                model = glm::translate(model,glm::vec3(cameraPosition.x, cameraPosition.y, 0));
+                
+                model = glm::rotate(model, cameraAngle, glm::vec3(0, 0, 1));
+                model = glm::translate(model, glm::vec3(0.5, 0.1, 0.005));
+                model = glm::scale(model, 0.15f * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
                 glUniform1i(uniTexID, 5);
@@ -804,8 +795,11 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
                 break;
                 
             case keye:
-                model = glm::translate(model,glm::vec3(cameraPosition.x + 0.4, cameraPosition.y + 0.5, 0.25));
-                model = glm::scale(model, 0.2f * glm::vec3(1, 1, 1));
+                model = glm::translate(model,glm::vec3(cameraPosition.x, cameraPosition.y, 0));
+                
+                model = glm::rotate(model, cameraAngle, glm::vec3(0, 0, 1));
+                model = glm::translate(model, glm::vec3(0.6, 0.1, 0.005));
+                model = glm::scale(model, 0.15f * glm::vec3(1, 1, 1));
                 glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
                 
                 glUniform1i(uniTexID, 6);

@@ -147,37 +147,37 @@ vector<Object> readMapFile(int *width, int *height, Object *start) {
 
 
 DoorLocation keyMatches(const ObjectType &door, const vector<Object> &keys, const vector<Object> &mapObjects) {
-    DoorLocation returnValue = {false, -1};
+    DoorLocation returnValue = {false, -1, -1};
     
     for (int i = 0; i < keys.size(); i++) {
         switch (keys.at(i).type) {
             case keya:
                 if (door == doorA) {
-                    returnValue = {true, findVectorLocationForObject(door, mapObjects)};
+                    returnValue = {true, findVectorLocationForObject(door, mapObjects), findVectorLocationForObject(keya, keys)};
                 }
                 break;
                 
             case keyb:
                 if (door == doorB) {
-                    returnValue = {true, findVectorLocationForObject(door, mapObjects)};
+                    returnValue = {true, findVectorLocationForObject(door, mapObjects), findVectorLocationForObject(keyb, keys)};
                 }
                 break;
                 
             case keyc:
                 if (door == doorC) {
-                    returnValue = {true, findVectorLocationForObject(door, mapObjects)};
+                    returnValue = {true, findVectorLocationForObject(door, mapObjects), findVectorLocationForObject(keyc, keys)};
                 }
                 break;
                 
             case keyd:
                 if (door == doorD) {
-                    returnValue = {true, findVectorLocationForObject(door, mapObjects)};
+                    returnValue = {true, findVectorLocationForObject(door, mapObjects), findVectorLocationForObject(keyd, keys)};
                 }
                 break;
                 
             case keye:
                 if (door == doorE) {
-                    returnValue = {true, findVectorLocationForObject(door, mapObjects)};
+                    returnValue = {true, findVectorLocationForObject(door, mapObjects), findVectorLocationForObject(keye, keys)};
                 }
                 break;
                 

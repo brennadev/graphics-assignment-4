@@ -69,6 +69,7 @@ struct KeyLocation {
 struct DoorLocation {
     bool matchingDoorFound;
     int location;
+    int activeKeysLocation;
 };
 
 
@@ -140,7 +141,7 @@ vector<Object> readMapFile(int *width, int *height, Object *start);
  @param door Door to check if corresponding key is held
  @param keys All keys currently held
  @param mapObjects All objects in scene
- @return true and door's vector index if corresponding key is held; false and -1 otherwise
+ @return true, door's vector index, and active keys vector index if corresponding key is held; false, -1, and -1 otherwise
  */
 DoorLocation keyMatches(const ObjectType &door, const vector<Object> &keys, const vector<Object> &mapObjects);
 

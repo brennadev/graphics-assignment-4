@@ -21,7 +21,6 @@ class Scene {
     public:
     Scene();
     void checkForEvents();
-    bool isWalkable(float newX, float newY);
     
     
     inline glm::vec3 getCameraPosition() {
@@ -115,9 +114,6 @@ class Scene {
     vector<Object> activeKeys;
     
     float angleAdjustmentAmount;
-    const float dxdyValues[];
-    
-    
 };
 
 #endif /* Scene_h */
